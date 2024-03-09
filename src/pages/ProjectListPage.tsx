@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Project } from '../types';
-import InputGroup from '../components/InputGroup';
-import Button from '../components/Button';
 import { Link } from 'react-router-dom';
+import { Project } from '@/types';
+import InputGroup from '@/components/InputGroup';
+import Button from '@/components/Button';
 
 type FormValues = {
 	name: string;
@@ -21,7 +21,7 @@ export default function ProjectListPage() {
 	};
 
 	return (
-		<div className="container mx-auto p-8 mt-8 bg-slate-300">
+		<div className="container mx-auto p-8 mt-8 bg-emerald-200">
 			<ul>
 				{projects.map((project) => (
 					<li key={project.id}>

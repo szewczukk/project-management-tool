@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom';
-import Button from '../components/Button';
+import Button from '@/components/Button';
 
 export default function ProjectPage() {
 	const params = useParams<{ id: string }>();
