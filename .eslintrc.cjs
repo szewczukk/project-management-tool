@@ -5,6 +5,7 @@ module.exports = {
 		'eslint:recommended',
 		'plugin:@typescript-eslint/recommended',
 		'plugin:react-hooks/recommended',
+		'plugin:react/recommended',
 		'prettier',
 	],
 	ignorePatterns: ['dist', '.eslintrc.cjs'],
@@ -15,5 +16,6 @@ module.exports = {
 			'warn',
 			{ allowConstantExport: true },
 		],
+		'react/react-in-jsx-scope': 'off',
 	},
 };
