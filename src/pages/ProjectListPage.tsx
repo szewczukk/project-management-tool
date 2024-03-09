@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Project } from './types';
-import InputGroup from './components/InputGroup';
-import Button from './components/Button';
+import { Project } from '../types';
+import InputGroup from '../components/InputGroup';
+import Button from '../components/Button';
 
 type FormValues = {
 	name: string;
 	description: string;
 };
 
-export default function App() {
+export default function ProjectListPage() {
 	const [projects, setProjects] = useState<Project[]>([]);
 	const { register, handleSubmit, reset } = useForm<FormValues>();
 
