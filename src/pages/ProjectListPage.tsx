@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { Project } from '../types';
 import InputGroup from '../components/InputGroup';
 import Button from '../components/Button';
+import { Link } from 'react-router-dom';
 
 type FormValues = {
 	name: string;
@@ -23,7 +24,9 @@ export default function ProjectListPage() {
 		<div className="container mx-auto p-8 mt-8 bg-slate-300">
 			<ul>
 				{projects.map((project) => (
-					<li key={project.id}>{project.name}</li>
+					<li key={project.id}>
+						<Link to={`/projects/${project.id}`}>{project.name}</Link>
+					</li>
 				))}
 			</ul>
 
