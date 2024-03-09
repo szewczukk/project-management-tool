@@ -2,9 +2,11 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
 import useProjectStore from '@/stores/project';
 import { useMemo } from 'react';
+import EditableText from '@/components/EditableText';
 
 export default function ProjectPage() {
-	const { projects, deleteProject } = useProjectStore();
+	const { projects, deleteProject, changeName, changeDescription } =
+		useProjectStore();
 	const navigate = useNavigate();
 	const params = useParams<{ id: string }>();
 
@@ -19,8 +21,18 @@ export default function ProjectPage() {
 
 	return (
 		<div className="container mt-8 p-8 bg-emerald-200 mx-auto">
-			<h1>Project {project.name}</h1>
-			<pre>{project.description}</pre>
+			<EditableText
+				value={project.name}
+				onChange={(newName) => changeName(project.id, newName)}
+				label="Name"
+			/>
+			<EditableText
+				value={project.description}
+				onChange={(newDescription) =>
+					changeDescription(project.id, newDescription)
+				}
+				label="Description"
+			/>
 
 			<Link to="/">
 				<Button>Return to list</Button>
