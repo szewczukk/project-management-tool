@@ -5,7 +5,8 @@ import { persist } from 'zustand/middleware';
 type ProjectStore = {
 	projects: Project[];
 
-	addProject(name: string, description: string): void;
+	addProject: (name: string, description: string) => void;
+	deleteProject: (id: string) => void;
 };
 
 const useProjectStore = create<ProjectStore>()(
@@ -18,6 +19,10 @@ const useProjectStore = create<ProjectStore>()(
 					projects: state.projects.concat([
 						{ id: crypto.randomUUID(), name, description },
 					]),
+				})),
+			deleteProject: (id: string) =>
+				set((state) => ({
+					projects: state.projects.filter((p) => p.id !== id),
 				})),
 		}),
 		{ name: 'projects-storage' },

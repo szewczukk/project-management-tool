@@ -1,10 +1,11 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
 import useProjectStore from '@/stores/project';
 import { useMemo } from 'react';
 
 export default function ProjectPage() {
-	const { projects } = useProjectStore();
+	const { projects, deleteProject } = useProjectStore();
+	const navigate = useNavigate();
 	const params = useParams<{ id: string }>();
 
 	const project = useMemo(
@@ -24,6 +25,16 @@ export default function ProjectPage() {
 			<Link to="/">
 				<Button>Return to list</Button>
 			</Link>
+
+			<Button
+				onClick={() => {
+					deleteProject(project.id);
+					navigate('/');
+				}}
+				className="bg-red-500 hover:bg-red-600"
+			>
+				Delete
+			</Button>
 		</div>
 	);
 }
