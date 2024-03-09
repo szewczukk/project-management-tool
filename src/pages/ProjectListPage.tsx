@@ -21,21 +21,13 @@ export default function ProjectListPage() {
 	};
 
 	return (
-		<div className="container mx-auto p-8 mt-8 bg-emerald-200">
-			<ul>
-				{projects.map((project) => (
-					<li key={project.id}>
-						<Link to={`/projects/${project.id}`}>{project.name}</Link>
-					</li>
-				))}
-			</ul>
-
+		<div className="container mx-auto p-8 mt-8 bg-emerald-200 flex flex-wrap">
 			<form
 				onSubmit={handleSubmit((values) => {
 					createProject(values.name, values.description);
 					reset();
 				})}
-				className="flex flex-col gap-4 items-start"
+				className="flex flex-col gap-4 items-start flex-grow"
 			>
 				<InputGroup
 					inputProps={{
@@ -56,6 +48,14 @@ export default function ProjectListPage() {
 
 				<Button type="submit">Create a project</Button>
 			</form>
+
+			<ul className="flex-grow">
+				{projects.map((project) => (
+					<li key={project.id}>
+						<Link to={`/projects/${project.id}`}>{project.name}</Link>
+					</li>
+				))}
+			</ul>
 		</div>
 	);
 }
