@@ -1,9 +1,8 @@
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
-import { Project } from '@/types';
 import InputGroup from '@/components/InputGroup';
 import Button from '@/components/Button';
+import useProjectStore from '@/stores/project';
 
 type FormValues = {
 	name: string;
@@ -11,20 +10,14 @@ type FormValues = {
 };
 
 export default function ProjectListPage() {
-	const [projects, setProjects] = useState<Project[]>([]);
+	const { projects, addProject } = useProjectStore();
 	const { register, handleSubmit, reset } = useForm<FormValues>();
-
-	const createProject = (name: string, description: string) => {
-		setProjects((prev) =>
-			prev.concat([{ id: crypto.randomUUID(), name, description }]),
-		);
-	};
 
 	return (
 		<div className="container mx-auto p-8 mt-8 bg-emerald-200 flex flex-wrap">
 			<form
 				onSubmit={handleSubmit((values) => {
-					createProject(values.name, values.description);
+					addProject(values.name, values.description);
 					reset();
 				})}
 				className="flex flex-col gap-4 items-start flex-grow"
