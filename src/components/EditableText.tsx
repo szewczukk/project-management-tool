@@ -14,7 +14,7 @@ export default function EditableText(props: Props) {
 
 	if (!isEditing) {
 		return (
-			<div className="">
+			<div className="flex gap-4 items-center">
 				<p>{value}</p>
 				<Button onClick={() => setIsEditing(true)}>Edit</Button>
 			</div>

@@ -20,33 +20,35 @@ export default function ProjectPage() {
 	}
 
 	return (
-		<div className="container mx-auto mt-8">
-			<EditableText
-				value={project.name}
-				onChange={(newName) => changeName(project.id, newName)}
-				label="Name"
-			/>
-			<EditableText
-				value={project.description}
-				onChange={(newDescription) =>
-					changeDescription(project.id, newDescription)
-				}
-				label="Description"
-			/>
-
-			<Link to="/">
-				<Button>Return to list</Button>
-			</Link>
-
-			<Button
-				onClick={() => {
-					deleteProject(project.id);
-					navigate('/');
-				}}
-				className="bg-red-500 hover:bg-red-600"
-			>
-				Delete
-			</Button>
+		<div className="container mx-auto mt-8 flex flex-col gap-8 items-start">
+			<div className="flex items-end gap-8">
+				<Link to="/">
+					<Button>Return to list</Button>
+				</Link>
+				<Button
+					onClick={() => {
+						deleteProject(project.id);
+						navigate('/');
+					}}
+					className="bg-red-500 hover:bg-red-600"
+				>
+					Delete
+				</Button>
+			</div>
+			<div className="flex flex-col gap-4">
+				<EditableText
+					value={project.name}
+					onChange={(newName) => changeName(project.id, newName)}
+					label="Name"
+				/>
+				<EditableText
+					value={project.description}
+					onChange={(newDescription) =>
+						changeDescription(project.id, newDescription)
+					}
+					label="Description"
+				/>
+			</div>
 		</div>
 	);
 }
