@@ -1,11 +1,12 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Button from '@/components/Button';
 import useProjectStore from '@/stores/project';
-import { useMemo } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import EditableText from '@/components/EditableText';
 import InputGroup from '@/components/InputGroup';
 import { useForm } from 'react-hook-form';
 import useUserStoriesStore from '@/stores/userStories';
+import { UserStory } from '@/types';
 
 type CreateUserStoryFormValues = {
 	name: string;
@@ -14,12 +15,14 @@ type CreateUserStoryFormValues = {
 };
 
 export default function ProjectPage() {
+	const userStoryRef = useRef<HTMLDialogElement>(null);
 	const { projects, deleteProject, changeName, changeDescription } =
 		useProjectStore();
-	const { addUserStory, userStories } = useUserStoriesStore();
+	const { addUserStory, userStories, changeStatus } = useUserStoriesStore();
 	const navigate = useNavigate();
 	const { handleSubmit, register } = useForm<CreateUserStoryFormValues>();
 	const params = useParams<{ id: string }>();
+	const [modalUserStory, setModalUserStory] = useState<UserStory | undefined>();
 
 	const project = useMemo(
 		() => projects.find((p) => p.id === params.id),
@@ -109,12 +112,94 @@ export default function ProjectPage() {
 			</form>
 			<div>
 				<h2>User stories</h2>
-				<ul>
-					{projectsUserStories.map((story) => (
-						<li key={story.id}>{story.name}</li>
-					))}
-				</ul>
+				<div className="grid grid-cols-3 w-full">
+					<div>
+						<h3>Todo</h3>
+						<ul>
+							{projectsUserStories
+								.filter((story) => story.status === 'todo')
+								.map((story) => (
+									<li key={story.id}>
+										<button
+											onClick={() => {
+												setModalUserStory(story);
+												userStoryRef.current?.showModal();
+											}}
+										>
+											{story.name}
+										</button>
+									</li>
+								))}
+						</ul>
+					</div>
+					<div>
+						<h3>Doing</h3>
+						<ul>
+							{projectsUserStories
+								.filter((story) => story.status === 'doing')
+								.map((story) => (
+									<li key={story.id}>
+										<button
+											onClick={() => {
+												setModalUserStory(story);
+												userStoryRef.current?.showModal();
+											}}
+										>
+											{story.name}
+										</button>
+									</li>
+								))}
+						</ul>
+					</div>
+					<div>
+						<h3>Done</h3>
+						<ul>
+							{projectsUserStories
+								.filter((story) => story.status === 'done')
+								.map((story) => (
+									<li key={story.id}>
+										<button
+											onClick={() => {
+												setModalUserStory(story);
+												userStoryRef.current?.showModal();
+											}}
+										>
+											{story.name}
+										</button>
+									</li>
+								))}
+						</ul>
+					</div>
+				</div>
 			</div>
+			<dialog ref={userStoryRef} className="p-4">
+				<h1>{modalUserStory?.name}</h1>
+				<select
+					className="px-3 py-1 rounded-sm bg-slate-300"
+					value={modalUserStory?.status}
+					onChange={(e) => {
+						const newStatus = e.target.value as UserStory['status'];
+
+						changeStatus(modalUserStory!.id, newStatus);
+						setModalUserStory(
+							(prev) =>
+								prev && {
+									...prev,
+									status: newStatus,
+								},
+						);
+					}}
+				>
+					<option value="todo">Todo</option>
+					<option value="doing">Doing</option>
+					<option value="done">Done</option>
+				</select>
+				<p>{modalUserStory?.priority}</p>
+				<p>{modalUserStory?.description}</p>
+				{modalUserStory && (
+					<p>{new Date(modalUserStory.creationDate).toISOString()}</p>
+				)}
+			</dialog>
 		</div>
 	);
 }

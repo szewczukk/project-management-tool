@@ -7,6 +7,7 @@ type ProjectStore = {
 
 	addUserStory: (dto: UserStoryDTO) => void;
 	deleteUserStory: (id: string) => void;
+	changeStatus: (id: string, status: UserStory['status']) => void;
 };
 
 const useUserStoriesStore = create<ProjectStore>()(
@@ -23,6 +24,15 @@ const useUserStoriesStore = create<ProjectStore>()(
 			deleteUserStory: (id: string) =>
 				set((state) => ({
 					userStories: state.userStories.filter((p) => p.id !== id),
+				})),
+			changeStatus: (id: string, status: UserStory['status']) =>
+				set((state) => ({
+					userStories: state.userStories.map((story) => {
+						if (story.id !== id) {
+							return story;
+						}
+						return { ...story, status };
+					}),
 				})),
 		}),
 		{ name: 'user-stories-storage' },
