@@ -14,13 +14,13 @@ export default function ProjectListPage() {
 	const { register, handleSubmit, reset } = useForm<FormValues>();
 
 	return (
-		<div className="container mx-auto p-8 mt-8 bg-emerald-200 flex flex-wrap">
+		<div className="container mx-auto mt-8 flex flex-col gap-8">
 			<form
 				onSubmit={handleSubmit((values) => {
 					addProject(values.name, values.description);
 					reset();
 				})}
-				className="flex flex-col gap-4 items-start flex-grow"
+				className="flex gap-4 items-end flex-grow"
 			>
 				<InputGroup
 					inputProps={{
@@ -42,13 +42,16 @@ export default function ProjectListPage() {
 				<Button type="submit">Create a project</Button>
 			</form>
 
-			<ul className="flex-grow">
-				{projects.map((project) => (
-					<li key={project.id}>
-						<Link to={`/projects/${project.id}`}>{project.name}</Link>
-					</li>
-				))}
-			</ul>
+			<div>
+				<h2>Projects:</h2>
+				<ul className="flex-grow">
+					{projects.map((project) => (
+						<li key={project.id}>
+							<Link to={`/projects/${project.id}`}>{project.name}</Link>
+						</li>
+					))}
+				</ul>
+			</div>
 		</div>
 	);
 }

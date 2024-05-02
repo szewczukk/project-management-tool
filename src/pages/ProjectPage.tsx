@@ -20,7 +20,7 @@ export default function ProjectPage() {
 	}
 
 	return (
-		<div className="container mt-8 p-8 bg-emerald-200 mx-auto">
+		<div className="container mx-auto mt-8">
 			<EditableText
 				value={project.name}
 				onChange={(newName) => changeName(project.id, newName)}
