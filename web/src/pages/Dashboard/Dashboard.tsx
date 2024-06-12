@@ -19,15 +19,18 @@ export default function Dashboard() {
 
 	return (
 		<div className="mx-auto mt-8 w-full max-w-[960px]">
-			<div className="mb-4 w-full">
+			<div className="mb-4 flex w-full gap-4">
 				<label className={styles.label}>
 					<input
 						type="text"
 						placeholder="Search here.."
-						className="w-full rounded-sm border border-slate-300 bg-slate-100 px-11 py-3 outline-offset-2"
+						className="w-full rounded-sm border border-slate-300 bg-slate-100 px-11 py-3 outline-offset-2 hover:bg-[#edf2f6]"
 						onChange={(e) => setFilter(e.target.value)}
 					/>
 				</label>
+				<button className="flex-shrink-0 rounded-sm bg-[#651E3E] px-6 text-white outline-offset-2 hover:bg-[#511832]">
+					Create Project
+				</button>
 			</div>
 			<ProjectsList filter={filter} projects={data} />
 		</div>
