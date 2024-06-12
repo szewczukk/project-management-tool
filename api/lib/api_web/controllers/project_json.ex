@@ -18,7 +18,8 @@ defmodule ApiWeb.ProjectJSON do
   defp data(%Project{} = project) do
     %{
       id: project.id,
-      title: project.title
+      title: project.title,
+      description: project.description
     }
   end
 end
