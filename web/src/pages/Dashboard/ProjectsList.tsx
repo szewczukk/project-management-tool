@@ -1,13 +1,18 @@
 import { Project } from '@/utils/types';
 
 type Props = {
+	filter: string;
 	projects: Project[];
 };
 
-export default function ProjectsList({ projects }: Props) {
+export default function ProjectsList({ filter, projects }: Props) {
+	const filteredProjects = projects.filter((project) =>
+		project.title.toLocaleLowerCase().startsWith(filter.toLocaleLowerCase()),
+	);
+
 	return (
-		<ul>
-			{projects.map((project) => (
+		<ul className="flex flex-col gap-4">
+			{filteredProjects.map((project) => (
 				<li key={project.id}>
 					<div className="w-full rounded-sm border border-slate-300 bg-slate-100 p-6">
 						<h2 className="text-base font-semibold">{project.title}</h2>
