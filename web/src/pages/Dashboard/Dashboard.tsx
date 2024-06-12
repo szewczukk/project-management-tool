@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
+import ProjectsList from './ProjectsList';
+import { projectSchema } from '@/utils/types';
 
 export default function Dashboard() {
 	const { data, error, status } = useProjectsQuery();
@@ -13,29 +15,18 @@ export default function Dashboard() {
 	}
 
 	return (
-		<div>
-			<h1 className="text-red-500">Hello, world!</h1>
-			<ul>
-				{data.map((project) => (
-					<li key={project.id}>{project.title}</li>
-				))}
-			</ul>
+		<div className="container mx-auto mt-8 max-w-[960px]">
+			<ProjectsList projects={data} />
 		</div>
 	);
 }
 
 const schema = z.object({
-	data: z.array(
-		z.object({
-			id: z.number(),
-			title: z.string(),
-			description: z.string(),
-		}),
-	),
+	data: z.array(projectSchema),
 });
 
 function useProjectsQuery() {
-	const query = useQuery({
+	return useQuery({
 		queryKey: ['projects'],
 		queryFn: async () => {
 			const response = await fetch('http://localhost:4000/api/projects');
@@ -45,6 +36,4 @@ function useProjectsQuery() {
 			return projects;
 		},
 	});
-
-	return query;
 }
