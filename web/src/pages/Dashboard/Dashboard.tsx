@@ -1,22 +1,17 @@
-import { useQuery } from '@tanstack/react-query';
-import { z } from 'zod';
 import ProjectsList from './ProjectsList';
-import { projectSchema } from '@/utils/types';
 import styles from './styles.module.css';
 import { useRef, useState } from 'react';
-import InputGroup from '@/components/InputGroup';
+import { useCreateProjectMutation, useProjectsQuery } from './queries';
+import CreateProjectModal from './CreateProjectModal';
 
 export default function Dashboard() {
 	const { data, error, status } = useProjectsQuery();
+	const createProjectMutation = useCreateProjectMutation();
 	const dialogRef = useRef<HTMLDialogElement>(null);
 	const [filter, setFilter] = useState('');
 
 	const onCreateProjectClick = () => {
 		dialogRef.current?.showModal();
-	};
-
-	const onCloseCreateProjectModal = () => {
-		dialogRef.current?.close();
 	};
 
 	if (status === 'pending') {
@@ -47,44 +42,10 @@ export default function Dashboard() {
 				</button>
 			</div>
 			<ProjectsList filter={filter} projects={data} />
-			<dialog ref={dialogRef} className="w-[360px] rounded-sm p-8">
-				<h2 className="mb-4 text-lg font-semibold">Create Project</h2>
-				<div className="flex flex-col gap-4">
-					<InputGroup
-						label="Title"
-						type="text"
-						id="title"
-						placeholder="Enter project title.."
-					/>
-					<InputGroup
-						label="Description"
-						id="title"
-						placeholder="Enter project description.."
-						isTextArea
-					/>
-					<button className="rounded-sm bg-[#651E3E] py-2 text-white outline-offset-2 hover:bg-[#511832]">
-						Create Project
-					</button>
-				</div>
-				<button onClick={onCloseCreateProjectModal}>X</button>
-			</dialog>
+			<CreateProjectModal
+				onCreateProject={(data) => console.log(data)}
+				ref={dialogRef}
+			/>
 		</div>
 	);
-}
-
-const schema = z.object({
-	data: z.array(projectSchema),
-});
-
-function useProjectsQuery() {
-	return useQuery({
-		queryKey: ['projects'],
-		queryFn: async () => {
-			const response = await fetch('http://localhost:4000/api/projects');
-			const result = await response.json();
-
-			const projects = schema.parse(result).data;
-			return projects;
-		},
-	});
 }
