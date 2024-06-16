@@ -1,7 +1,11 @@
 import ProjectsList from './ProjectsList';
 import styles from './styles.module.css';
 import { useRef, useState } from 'react';
-import { useCreateProjectMutation, useProjectsQuery } from './queries';
+import {
+	CreateProjectData,
+	useCreateProjectMutation,
+	useProjectsQuery,
+} from './queries';
 import CreateProjectModal from './CreateProjectModal';
 
 export default function Dashboard() {
@@ -12,6 +16,10 @@ export default function Dashboard() {
 
 	const onCreateProjectClick = () => {
 		dialogRef.current?.showModal();
+	};
+
+	const onCreateProject = async (values: CreateProjectData) => {
+		await createProjectMutation.mutateAsync(values);
 	};
 
 	if (status === 'pending') {
@@ -42,10 +50,7 @@ export default function Dashboard() {
 				</button>
 			</div>
 			<ProjectsList filter={filter} projects={data} />
-			<CreateProjectModal
-				onCreateProject={(data) => console.log(data)}
-				ref={dialogRef}
-			/>
+			<CreateProjectModal onCreateProject={onCreateProject} ref={dialogRef} />
 		</div>
 	);
 }
