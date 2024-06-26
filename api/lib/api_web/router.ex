@@ -8,7 +8,9 @@ defmodule ApiWeb.Router do
   scope "/api", ApiWeb do
     pipe_through :api
 
-    resources "/projects", ProjectController
+    resources "/projects", ProjectController do
+      resources "/epics", EpicController
+    end
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
