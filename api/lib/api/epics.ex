@@ -22,7 +22,7 @@ defmodule Api.Epics do
   end
 
   def list_epics_by_project(project_id) do
-    Repo.all(from e in Epic, where: e.project == ^project_id)
+    Repo.all(from e in Epic, where: e.project_id == ^project_id)
   end
 
   @doc """

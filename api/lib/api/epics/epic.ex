@@ -4,7 +4,7 @@ defmodule Api.Epics.Epic do
 
   schema "epics" do
     field :title, :string
-    field :project, :id
+    belongs_to :project, Api.Projects.Project
 
     timestamps(type: :utc_datetime)
   end
@@ -12,7 +12,7 @@ defmodule Api.Epics.Epic do
   @doc false
   def changeset(epic, attrs) do
     epic
-    |> cast(attrs, [:title, :project])
-    |> validate_required([:title, :project])
+    |> cast(attrs, [:title, :project_id])
+    |> validate_required([:title, :project_id])
   end
 end

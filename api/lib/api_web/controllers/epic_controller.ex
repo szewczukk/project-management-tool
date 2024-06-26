@@ -12,7 +12,7 @@ defmodule ApiWeb.EpicController do
   end
 
   def create(conn, %{"epic" => epic_params, "project_id" => project_id}) do
-    epic_params = Map.put(epic_params, "project", project_id)
+    epic_params = Map.put(epic_params, "project_id", project_id)
 
     with {:ok, %Epic{} = epic} <- Epics.create_epic(epic_params) do
       conn

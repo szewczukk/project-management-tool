@@ -15,7 +15,7 @@ defmodule ApiWeb.EpicJSON do
     %{data: data(epic)}
   end
 
-  defp data(%Epic{} = epic) do
+  def data(%Epic{} = epic) do
     %{
       id: epic.id,
       title: epic.title

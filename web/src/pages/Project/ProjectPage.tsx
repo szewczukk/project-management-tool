@@ -1,11 +1,11 @@
 import api from '@/utils/api';
-import { projectSchema } from '@/utils/types';
+import { projectWithEpicsSchema } from '@/utils/types';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 
 const getProjectResponseSchema = z.object({
-	data: projectSchema,
+	data: projectWithEpicsSchema,
 });
 
 export default function ProjectPage() {
@@ -28,5 +28,25 @@ export default function ProjectPage() {
 		return <p>Loading..</p>;
 	}
 
-	return <h1>{JSON.stringify(data)}</h1>;
+	return (
+		<div className="flex h-screen">
+			<aside className="h-full w-[256px] bg-slate-200">
+				<ul>
+					{data.epics.map((epic) => (
+						<li
+							key={epic.id}
+							className="w-full cursor-pointer p-4 hover:bg-slate-300"
+						>
+							{epic.title}
+						</li>
+					))}
+				</ul>
+			</aside>
+			<div className="w-full">
+				<div className="bg-slate-100 p-2">
+					<h1>Project: {data.title}</h1>
+				</div>
+			</div>
+		</div>
+	);
 }
