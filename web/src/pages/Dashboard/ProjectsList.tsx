@@ -1,4 +1,5 @@
 import { Project } from '@/utils/types';
+import { Link } from 'react-router-dom';
 
 type Props = {
 	filter: string;
@@ -15,7 +16,9 @@ export default function ProjectsList({ filter, projects }: Props) {
 			{filteredProjects.map((project) => (
 				<li key={project.id}>
 					<div className="w-full rounded-sm border border-slate-300 bg-slate-100 p-6">
-						<h2 className="text-base font-semibold">{project.title}</h2>
+						<h2 className="text-base font-semibold">
+							<Link to={`/projects/${project.id}`}>{project.title}</Link>
+						</h2>
 						<p className="mt-3 text-sm">{project.description}</p>
 					</div>
 				</li>
