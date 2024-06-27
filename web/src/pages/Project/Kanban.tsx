@@ -6,6 +6,17 @@ type Props = {
 	tasks: Task[];
 };
 
+function showStatus(status: Task['status']) {
+	switch (status) {
+		case 'doing':
+			return 'Doing 🧑‍💻';
+		case 'todo':
+			return 'To do 🤔';
+		case 'done':
+			return 'Done 🎉';
+	}
+}
+
 export default function Kanban({ tasks, epicTitle }: Props) {
 	const groupedTasks = useMemo(() => {
 		return tasks.reduce<Map<Task['status'], Task[]>>(
@@ -26,7 +37,7 @@ export default function Kanban({ tasks, epicTitle }: Props) {
 			<div className="flex flex-wrap gap-4">
 				{[...groupedTasks.entries()].map(([status, todos]) => (
 					<div className="flex flex-1 flex-col items-center gap-2 p-4">
-						<p className="text-center">{status}</p>
+						<p className="text-center">{showStatus(status)}</p>
 						<ul key={status}>
 							{todos.map((todo) => (
 								<li key={todo.id}>
