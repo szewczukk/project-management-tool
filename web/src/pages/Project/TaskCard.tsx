@@ -7,7 +7,8 @@ type Props = {
 
 export default function TaskCard({ task }: Props) {
 	const { attributes, listeners, setNodeRef, transform } = useDraggable({
-		id: task.id,
+		id: `taskCard:${task.id}`,
+		data: { taskId: task.id },
 	});
 
 	const style = transform

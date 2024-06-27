@@ -5,7 +5,7 @@ import { useDroppable } from '@dnd-kit/core';
 type Props = {
 	status: Task['status'];
 	tasks: Task[];
-	droppableId: string;
+	epicTitle: string;
 };
 
 function showStatus(status: Task['status']) {
@@ -19,9 +19,10 @@ function showStatus(status: Task['status']) {
 	}
 }
 
-export default function Section({ status, tasks, droppableId }: Props) {
+export default function Section({ status, tasks, epicTitle }: Props) {
 	const { setNodeRef, isOver } = useDroppable({
-		id: droppableId,
+		id: `${epicTitle}/${status}`,
+		data: { status },
 	});
 
 	const style = {

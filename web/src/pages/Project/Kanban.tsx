@@ -1,5 +1,11 @@
-import { Task, TaskStatus, taskSchema, taskStatuses } from '@/utils/types';
-import { useState } from 'react';
+import {
+	Task,
+	TaskStatus,
+	taskSchema,
+	taskStatusSchema,
+	taskStatuses,
+} from '@/utils/types';
+import { act, useState } from 'react';
 import { z } from 'zod';
 import Section from './Secion';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
@@ -27,18 +33,25 @@ export default function Kanban({
 			return;
 		}
 
+		const { taskId } = z
+			.object({ taskId: z.number() })
+			.parse(active.data.current);
+		const { status } = z
+			.object({ status: taskStatusSchema })
+			.parse(over.data.current);
+
 		setTasks((prev) =>
 			prev.map((task) => {
-				if (task.id === active.id) {
-					return { ...task, status: over!.id as TaskStatus };
+				if (task.id === taskId) {
+					return { ...task, status };
 				}
 
 				return task;
 			}),
 		);
 		changeTaskStatus({
-			id: parseInt(active.id.toString()),
-			newStatus: over!.id as TaskStatus,
+			id: taskId,
+			newStatus: status,
 		});
 	};
 
@@ -52,7 +65,7 @@ export default function Kanban({
 							status={status}
 							tasks={tasks.filter((task) => task.status === status)}
 							key={status}
-							droppableId={status}
+							epicTitle={epicTitle || 'Non-aligned'}
 						/>
 					))}
 				</DndContext>
