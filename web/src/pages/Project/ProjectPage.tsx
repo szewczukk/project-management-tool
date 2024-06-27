@@ -3,6 +3,7 @@ import { projectWithEpicsSchema } from '@/utils/types';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
+import Kanban from './Kanban';
 
 const getProjectResponseSchema = z.object({
 	data: projectWithEpicsSchema,
@@ -10,7 +11,11 @@ const getProjectResponseSchema = z.object({
 
 export default function ProjectPage() {
 	const { id } = useParams();
-	const { data, error, status } = useQuery({
+	const {
+		data: project,
+		error,
+		status,
+	} = useQuery({
 		queryKey: ['projects', id],
 		queryFn: async () => {
 			const response = await api.get(`/projects/${id}`);
@@ -29,24 +34,17 @@ export default function ProjectPage() {
 	}
 
 	return (
-		<div className="flex h-screen">
-			<aside className="h-full w-[256px] bg-slate-200">
-				<ul>
-					{data.epics.map((epic) => (
-						<li
-							key={epic.id}
-							className="w-full cursor-pointer p-4 hover:bg-slate-300"
-						>
-							{epic.title}
-						</li>
-					))}
-				</ul>
-			</aside>
-			<div className="w-full">
-				<div className="bg-slate-100 p-2">
-					<h1>Project: {data.title}</h1>
-				</div>
-			</div>
+		<div className="h-screen w-full">
+			<nav className="bg-slate-100 p-4">
+				<h1>Project: {project.title}</h1>
+			</nav>
+			<ul className="flex flex-col gap-4 p-2">
+				<Kanban tasks={project.tasks} />
+
+				{project.epics.map((epic) => (
+					<Kanban tasks={epic.tasks} epicTitle={epic.title} />
+				))}
+			</ul>
 		</div>
 	);
 }
