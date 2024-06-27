@@ -8,10 +8,14 @@ export const projectSchema = z.object({
 
 export type Project = z.infer<typeof projectSchema>;
 
+export const taskStatuses = ['todo', 'doing', 'done'] as const;
+export const taskStatusSchema = z.enum(taskStatuses);
+export type TaskStatus = z.infer<typeof taskStatusSchema>;
+
 export const taskSchema = z.object({
 	id: z.number(),
 	title: z.string(),
-	status: z.literal('todo').or(z.literal('doing')).or(z.literal('done')),
+	status: taskStatusSchema,
 });
 
 export type Task = z.infer<typeof taskSchema>;

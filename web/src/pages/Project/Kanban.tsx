@@ -1,53 +1,48 @@
-import { Task } from '@/utils/types';
-import { useMemo } from 'react';
-import TaskCard from './TaskCard';
+import { Task, TaskStatus, taskStatuses } from '@/utils/types';
+import { useState } from 'react';
+import Section from './Secion';
+import { DndContext, DragEndEvent } from '@dnd-kit/core';
 
 type Props = {
 	epicTitle?: string;
 	tasks: Task[];
 };
 
-function showStatus(status: Task['status']) {
-	switch (status) {
-		case 'doing':
-			return 'Doing 🧑‍💻';
-		case 'todo':
-			return 'To do 🤔';
-		case 'done':
-			return 'Done 🎉';
-	}
-}
+export default function Kanban({ tasks: initialTasks, epicTitle }: Props) {
+	const [tasks, setTasks] = useState(initialTasks);
 
-export default function Kanban({ tasks, epicTitle }: Props) {
-	const groupedTasks = useMemo(() => {
-		return tasks.reduce<Map<Task['status'], Task[]>>(
-			(acc, curr) => {
-				return acc.set(curr.status, acc.get(curr.status)!.concat([curr]));
-			},
-			new Map([
-				['todo', []],
-				['doing', []],
-				['done', []],
-			]),
+	const handleDragEnd = (event: DragEndEvent) => {
+		const { over, active } = event;
+
+		if (!over) {
+			return;
+		}
+
+		setTasks((prev) =>
+			prev.map((task) => {
+				if (task.id === active.id) {
+					return { ...task, status: over!.id as TaskStatus };
+				}
+
+				return task;
+			}),
 		);
-	}, [tasks]);
+	};
 
 	return (
 		<div className="flex flex-col gap-2 bg-slate-100 p-4">
 			<h2>Epic: {epicTitle || 'Non-aligned'}</h2>
 			<div className="flex flex-wrap gap-4">
-				{[...groupedTasks.entries()].map(([status, tasks]) => (
-					<div className="flex flex-1 flex-col items-center gap-2 p-4">
-						<p className="text-center">{showStatus(status)}</p>
-						<ul key={status}>
-							{tasks.map((task) => (
-								<li key={task.id}>
-									<TaskCard task={task} />
-								</li>
-							))}
-						</ul>
-					</div>
-				))}
+				<DndContext onDragEnd={handleDragEnd}>
+					{taskStatuses.map((status) => (
+						<Section
+							status={status}
+							tasks={tasks.filter((task) => task.status === status)}
+							key={status}
+							droppableId={status}
+						/>
+					))}
+				</DndContext>
 			</div>
 		</div>
 	);
