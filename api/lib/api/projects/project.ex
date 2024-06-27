@@ -6,6 +6,7 @@ defmodule Api.Projects.Project do
     field :title, :string
     field :description, :string
     has_many :epics, Api.Epics.Epic
+    has_many :tasks, Api.Tasks.Task
 
     timestamps(type: :utc_datetime)
   end

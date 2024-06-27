@@ -38,7 +38,7 @@ defmodule Api.Projects do
   def get_project!(id) do
     Project
     |> Repo.get!(id)
-    |> Repo.preload(:epics)
+    |> Repo.preload(epics: [:tasks])
   end
 
   @doc """

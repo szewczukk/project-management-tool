@@ -18,7 +18,11 @@ defmodule ApiWeb.EpicJSON do
   def data(%Epic{} = epic) do
     %{
       id: epic.id,
-      title: epic.title
+      title: epic.title,
+      tasks: load_tasks(epic.tasks)
     }
   end
+
+  defp load_tasks(%Ecto.Association.NotLoaded{}), do: []
+  defp load_tasks(tasks), do: for(task <- tasks || [], do: ApiWeb.TaskJSON.data(task))
 end

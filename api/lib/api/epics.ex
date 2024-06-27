@@ -18,11 +18,16 @@ defmodule Api.Epics do
 
   """
   def list_epics do
-    Repo.all(Epic)
+    Epic
+    |> preload(:tasks)
+    |> Repo.all()
   end
 
   def list_epics_by_project(project_id) do
-    Repo.all(from e in Epic, where: e.project_id == ^project_id)
+    Epic
+    |> where([e], e.project_id == ^project_id)
+    |> preload(:tasks)
+    |> Repo.all()
   end
 
   @doc """
@@ -39,7 +44,11 @@ defmodule Api.Epics do
       ** (Ecto.NoResultsError)
 
   """
-  def get_epic!(id), do: Repo.get!(Epic, id)
+  def get_epic!(id) do
+    Epic
+    |> Repo.get!(id)
+    |> Repo.preload(:tasks)
+  end
 
   @doc """
   Creates a epic.

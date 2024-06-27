@@ -9,8 +9,15 @@ defmodule ApiWeb.Router do
     pipe_through :api
 
     resources "/projects", ProjectController do
-      resources "/epics", EpicController
+      resources "/epics", EpicController do
+        resources "/tasks", TaskController
+      end
+
+      resources "/tasks", TaskController, only: [:index]
     end
+
+    resources "/tasks", TaskController, only: [:update, :delete, :show]
+    resources "/epics", EpicController, only: [:update, :delete, :show]
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

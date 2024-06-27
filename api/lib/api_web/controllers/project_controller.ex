@@ -22,7 +22,7 @@ defmodule ApiWeb.ProjectController do
 
   def show(conn, %{"id" => id}) do
     project = Projects.get_project!(id)
-    render(conn, :show, project: project)
+    render(conn, :show_with_epics, project: project)
   end
 
   def update(conn, %{"id" => id, "project" => project_params}) do

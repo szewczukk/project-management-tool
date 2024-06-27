@@ -5,6 +5,7 @@ defmodule Api.Epics.Epic do
   schema "epics" do
     field :title, :string
     belongs_to :project, Api.Projects.Project
+    has_many :tasks, Api.Tasks.Task
 
     timestamps(type: :utc_datetime)
   end

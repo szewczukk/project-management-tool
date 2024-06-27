@@ -12,6 +12,13 @@ defmodule ApiWeb.ProjectJSON do
   Renders a single project.
   """
   def show(%{project: project}) do
+    %{data: data(project)}
+  end
+
+  @doc """
+  Renders a single project.
+  """
+  def show_with_epics(%{project: project}) do
     %{data: data_with_epics(project)}
   end
 
@@ -28,7 +35,7 @@ defmodule ApiWeb.ProjectJSON do
       id: project.id,
       title: project.title,
       description: project.description,
-      epics: for(epic <- project.epics, do: ApiWeb.EpicJSON.data(epic))
+      epics: for(epic <- project.epics || [], do: ApiWeb.EpicJSON.data(epic))
     }
   end
 end
