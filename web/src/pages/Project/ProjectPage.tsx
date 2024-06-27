@@ -39,14 +39,10 @@ export default function ProjectPage() {
 				<h1>Project: {project.title}</h1>
 			</nav>
 			<ul className="flex flex-col gap-4 p-2">
-				<Kanban tasks={project.tasks} projectId={project.id} />
+				<Kanban tasks={project.tasks} />
 
 				{project.epics.map((epic) => (
-					<Kanban
-						tasks={epic.tasks}
-						epicTitle={epic.title}
-						projectId={project.id}
-					/>
+					<Kanban tasks={epic.tasks} epicTitle={epic.title} key={epic.id} />
 				))}
 			</ul>
 		</div>

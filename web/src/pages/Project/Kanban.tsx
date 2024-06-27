@@ -5,25 +5,20 @@ import {
 	taskStatusSchema,
 	taskStatuses,
 } from '@/utils/types';
-import { act, useState } from 'react';
+import { useState } from 'react';
 import { z } from 'zod';
 import Section from './Secion';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import api from '@/utils/api';
 
 type Props = {
-	projectId: number;
 	epicTitle?: string;
 	tasks: Task[];
 };
 
-export default function Kanban({
-	tasks: initialTasks,
-	epicTitle,
-	projectId,
-}: Props) {
-	const { mutate: changeTaskStatus } = useChangeTaskStatus(projectId);
+export default function Kanban({ tasks: initialTasks, epicTitle }: Props) {
+	const { mutate: changeTaskStatus } = useChangeTaskStatus();
 	const [tasks, setTasks] = useState(initialTasks);
 
 	const handleDragEnd = (event: DragEndEvent) => {
@@ -78,9 +73,7 @@ const mutateChangeTaskStatusResponseSchema = z.object({
 	data: taskSchema,
 });
 
-export function useChangeTaskStatus(projectId: number) {
-	const queryClient = useQueryClient();
-
+export function useChangeTaskStatus() {
 	return useMutation({
 		mutationFn: async (data: { id: number; newStatus: TaskStatus }) => {
 			const response = await api.patch(`/tasks/${data.id}`, {
@@ -91,17 +84,6 @@ export function useChangeTaskStatus(projectId: number) {
 				response.data,
 			).data;
 			return task;
-		},
-		onSuccess(data) {
-			queryClient.setQueryData(['projects', projectId], (old) => {
-				return old.map((task) => {
-					if (task.id === data.id) {
-						return data;
-					}
-
-					return taskSchema;
-				});
-			});
 		},
 	});
 }
