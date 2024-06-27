@@ -13,7 +13,7 @@ defmodule ApiWeb.Router do
         resources "/tasks", TaskController
       end
 
-      resources "/tasks", TaskController, only: [:index]
+      resources "/tasks", TaskController
     end
 
     resources "/tasks", TaskController, only: [:update, :delete, :show]

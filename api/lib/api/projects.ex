@@ -6,6 +6,7 @@ defmodule Api.Projects do
   import Ecto.Query, warn: false
   alias Api.Repo
 
+  alias Api.Tasks.Task
   alias Api.Projects.Project
 
   @doc """
@@ -38,7 +39,7 @@ defmodule Api.Projects do
   def get_project!(id) do
     Project
     |> Repo.get!(id)
-    |> Repo.preload(epics: [:tasks])
+    |> Repo.preload(epics: [:tasks], tasks: [])
   end
 
   @doc """

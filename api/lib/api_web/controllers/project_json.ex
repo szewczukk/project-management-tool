@@ -35,7 +35,11 @@ defmodule ApiWeb.ProjectJSON do
       id: project.id,
       title: project.title,
       description: project.description,
-      epics: for(epic <- project.epics || [], do: ApiWeb.EpicJSON.data(epic))
+      epics: for(epic <- project.epics || [], do: ApiWeb.EpicJSON.data(epic)),
+      tasks: load_tasks(project.tasks)
     }
   end
+
+  defp load_tasks(%Ecto.Association.NotLoaded{}), do: []
+  defp load_tasks(tasks), do: for(task <- tasks || [], do: ApiWeb.TaskJSON.data(task))
 end

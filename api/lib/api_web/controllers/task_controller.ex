@@ -16,9 +16,17 @@ defmodule ApiWeb.TaskController do
     render(conn, :index, tasks: tasks)
   end
 
-  def create(conn, %{"task" => task_params, "project_id" => project_id, "epic_id" => epic_id}) do
+  def create(
+        conn,
+        %{"task" => task_params, "project_id" => project_id} = params
+      ) do
     task_params = Map.put(task_params, "project_id", project_id)
-    task_params = Map.put(task_params, "epic_id", epic_id)
+
+    task_params =
+      case Map.get(params, "epic_id") do
+        nil -> task_params
+        id -> Map.put(task_params, "epic_id", id)
+      end
 
     with {:ok, %Task{} = task} <- Tasks.create_task(task_params) do
       conn

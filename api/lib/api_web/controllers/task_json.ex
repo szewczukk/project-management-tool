@@ -18,7 +18,8 @@ defmodule ApiWeb.TaskJSON do
   def data(%Task{} = task) do
     %{
       id: task.id,
-      title: task.title
+      title: task.title,
+      status: task.status
     }
   end
 end
