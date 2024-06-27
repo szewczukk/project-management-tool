@@ -8,7 +8,7 @@ export const projectSchema = z.object({
 
 export type Project = z.infer<typeof projectSchema>;
 
-export const taskStatuses = ['todo', 'doing', 'done'] as const;
+export const taskStatuses = ['todo', 'inprogress', 'done'] as const;
 export const taskStatusSchema = z.enum(taskStatuses);
 export type TaskStatus = z.infer<typeof taskStatusSchema>;
 

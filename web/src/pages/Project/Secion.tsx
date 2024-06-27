@@ -10,8 +10,8 @@ type Props = {
 
 function showStatus(status: Task['status']) {
 	switch (status) {
-		case 'doing':
-			return 'Doing 🧑‍💻';
+		case 'inprogress':
+			return 'In progress 🧑‍💻';
 		case 'todo':
 			return 'To do 🤔';
 		case 'done':
