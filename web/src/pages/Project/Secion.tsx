@@ -1,6 +1,7 @@
 import { Task } from '@/utils/types';
 import TaskCard from './TaskCard';
 import { useDroppable } from '@dnd-kit/core';
+import classNames from 'classnames';
 
 type Props = {
 	status: Task['status'];
@@ -25,15 +26,16 @@ export default function Section({ status, tasks, epicTitle }: Props) {
 		data: { status },
 	});
 
-	const style = {
-		color: isOver ? 'green' : undefined,
-	};
-
 	return (
 		<div
-			className="flex flex-1 flex-col items-center gap-2 p-4"
+			className={classNames(
+				'flex flex-1 flex-col items-center gap-2 rounded-sm border p-4',
+				{
+					'border-slate-300': isOver,
+					'border-transparent': !isOver,
+				},
+			)}
 			ref={setNodeRef}
-			style={style}
 		>
 			<p className="text-center">{showStatus(status)}</p>
 			<ul key={status}>
