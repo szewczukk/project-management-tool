@@ -1,5 +1,6 @@
 import { Task } from '@/utils/types';
 import { useMemo } from 'react';
+import TaskCard from './TaskCard';
 
 type Props = {
 	epicTitle?: string;
@@ -35,15 +36,13 @@ export default function Kanban({ tasks, epicTitle }: Props) {
 		<div className="flex flex-col gap-2 bg-slate-100 p-4">
 			<h2>Epic: {epicTitle || 'Non-aligned'}</h2>
 			<div className="flex flex-wrap gap-4">
-				{[...groupedTasks.entries()].map(([status, todos]) => (
+				{[...groupedTasks.entries()].map(([status, tasks]) => (
 					<div className="flex flex-1 flex-col items-center gap-2 p-4">
 						<p className="text-center">{showStatus(status)}</p>
 						<ul key={status}>
-							{todos.map((todo) => (
-								<li key={todo.id}>
-									<div className="min-h-32 w-32 rounded-sm border border-slate-300 bg-slate-100 p-4">
-										<p>{todo.title}</p>
-									</div>
+							{tasks.map((task) => (
+								<li key={task.id}>
+									<TaskCard task={task} />
 								</li>
 							))}
 						</ul>
