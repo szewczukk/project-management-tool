@@ -1,15 +1,15 @@
-import { Task } from '@/utils/types';
+import { Task, TaskStatus } from '@/utils/types';
 import TaskCard from './TaskCard';
 import { useDroppable } from '@dnd-kit/core';
 import classNames from 'classnames';
 
 type Props = {
-	status: Task['status'];
+	status: TaskStatus;
 	tasks: Task[];
 	epicTitle: string;
 };
 
-function showStatus(status: Task['status']) {
+function showStatus(status: TaskStatus) {
 	switch (status) {
 		case 'inprogress':
 			return 'In progress 🧑‍💻';
