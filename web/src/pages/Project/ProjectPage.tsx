@@ -29,7 +29,15 @@ export default function ProjectPage() {
 	});
 	const { mutate: createTask } = useMutation({
 		mutationFn: async (data: CreateTaskData) => {
-			const response = await api.post(`/projects/${id}/tasks`, data);
+			if (!data.task.epicId) {
+				const response = await api.post(`/projects/${id}/tasks`, data);
+				return response.data.data;
+			}
+
+			const response = await api.post(
+				`/projects/${id}/epics/${data.task.epicId}/tasks`,
+				data,
+			);
 
 			return response.data.data;
 		},
@@ -63,7 +71,11 @@ export default function ProjectPage() {
 					<Kanban tasks={epic.tasks} epicTitle={epic.title} key={epic.id} />
 				))}
 			</ul>
-			<CreateTaskModal onCreateTask={handleCreateTask} ref={ref} />
+			<CreateTaskModal
+				onCreateTask={handleCreateTask}
+				epics={project.epics}
+				ref={ref}
+			/>
 		</div>
 	);
 }

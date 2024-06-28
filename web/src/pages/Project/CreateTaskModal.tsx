@@ -1,16 +1,17 @@
 import InputGroup from '@/components/InputGroup';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { useFormik } from 'formik';
-import { Task } from '@/utils/types';
+import { Epic, Task } from '@/utils/types';
 
-export type CreateTaskData = { task: Omit<Task, 'id'> };
+export type CreateTaskData = { task: Omit<Task, 'id'> & { epicId?: number } };
 
 type Props = {
 	onCreateTask: (data: CreateTaskData) => void;
+	epics: Epic[];
 };
 
 export default forwardRef<HTMLDialogElement, Props>(function CreateTaskModal(
-	{ onCreateTask },
+	{ onCreateTask, epics },
 	ref,
 ) {
 	const innerRef = useRef<HTMLDialogElement>(null);
@@ -34,7 +35,21 @@ export default forwardRef<HTMLDialogElement, Props>(function CreateTaskModal(
 					value={formik.values.title}
 				/>
 				<select
+					id="epic"
+					name="epic"
+					onChange={formik.handleChange}
+					value={formik.values.status}
+				>
+					<option>---</option>
+					{epics.map((epic) => (
+						<option value={epic.id} key={epic.id}>
+							{epic.title}
+						</option>
+					))}
+				</select>
+				<select
 					id="status"
+					name="status"
 					onChange={formik.handleChange}
 					value={formik.values.status}
 				>
