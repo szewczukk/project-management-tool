@@ -57,14 +57,14 @@ export default function ProjectPage() {
 	}
 
 	return (
-		<div className="h-screen w-full">
-			<nav className="bg-slate-100 p-4">
+		<div className="flex h-screen w-full flex-col overflow-hidden">
+			<nav className="bg-slate-200 p-4">
 				<h1>Project: {project.title}</h1>
 				<button onClick={() => ref.current?.showModal()}>
 					Create a new task
 				</button>
 			</nav>
-			<ul className="flex flex-col gap-4 p-2">
+			<ul className="flex flex-col gap-4 overflow-y-auto p-4">
 				<Kanban tasks={project.tasks} />
 
 				{project.epics.map((epic) => (

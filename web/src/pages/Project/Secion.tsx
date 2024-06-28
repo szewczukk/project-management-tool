@@ -38,7 +38,7 @@ export default function Section({ status, tasks, epicTitle }: Props) {
 			ref={setNodeRef}
 		>
 			<p className="text-center">{showStatus(status)}</p>
-			<ul key={status}>
+			<ul key={status} className="flex flex-col gap-4">
 				{tasks.map((task) => (
 					<li key={task.id}>
 						<TaskCard task={task} />
