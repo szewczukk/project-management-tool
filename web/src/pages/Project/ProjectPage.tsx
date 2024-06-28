@@ -1,6 +1,6 @@
 import api from '@/utils/api';
 import { projectWithEpicsSchema } from '@/utils/types';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 import Kanban from './Kanban';
@@ -14,6 +14,7 @@ const getProjectResponseSchema = z.object({
 
 export default function ProjectPage() {
 	const { id } = useParams();
+	const queryClient = useQueryClient();
 	const ref = useRef<HTMLDialogElement>(null);
 	const {
 		data: project,
@@ -30,7 +31,7 @@ export default function ProjectPage() {
 	});
 	const { mutate: createTask } = useMutation({
 		mutationFn: async (data: CreateTaskData) => {
-			if (!data.task.epicId) {
+			if (data.task.epicId === -1) {
 				const response = await api.post(`/projects/${id}/tasks`, data);
 				return response.data.data;
 			}
@@ -41,6 +42,21 @@ export default function ProjectPage() {
 			);
 
 			return response.data.data;
+		},
+		onSuccess(data, variables) {
+			queryClient.setQueryData(['projects', id], (old) => {
+				if (variables.task.epicId === -1) {
+					old.tasks.push(data);
+					return old;
+				}
+
+				const epicIndex = old.epics.findIndex(
+					(epic) => epic.id.toString() === variables.task.epicId?.toString(),
+				);
+
+				old.epics[epicIndex].tasks.push(data);
+				return old;
+			});
 		},
 	});
 

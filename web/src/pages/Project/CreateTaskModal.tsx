@@ -17,7 +17,7 @@ export default forwardRef<HTMLDialogElement, Props>(function CreateTaskModal(
 ) {
 	const innerRef = useRef<HTMLDialogElement>(null);
 	const formik = useFormik<CreateTaskData['task']>({
-		initialValues: { title: '', status: 'todo' },
+		initialValues: { title: '', status: 'todo', epicId: -1 },
 		onSubmit: (values) => onCreateTask({ task: values }),
 	});
 
@@ -32,28 +32,17 @@ export default forwardRef<HTMLDialogElement, Props>(function CreateTaskModal(
 					type="text"
 					id="title"
 					placeholder="Enter project title.."
-					onChange={formik.handleChange}
-					value={formik.values.title}
+					{...formik.getFieldProps('title')}
 				/>
-				<select
-					id="epic"
-					name="epic"
-					onChange={formik.handleChange}
-					value={formik.values.status}
-				>
-					<option>---</option>
+				<select id="epicId" {...formik.getFieldProps('epicId')}>
+					<option value={-1}>---</option>
 					{epics.map((epic) => (
 						<option value={epic.id} key={epic.id}>
 							{epic.title}
 						</option>
 					))}
 				</select>
-				<select
-					id="status"
-					name="status"
-					onChange={formik.handleChange}
-					value={formik.values.status}
-				>
+				<select id="status" {...formik.getFieldProps('status')}>
 					<option value="todo">To do</option>
 					<option value="inprogress">In progress</option>
 					<option value="done">Done</option>
