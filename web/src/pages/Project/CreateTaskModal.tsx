@@ -2,6 +2,7 @@ import InputGroup from '@/components/InputGroup';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { useFormik } from 'formik';
 import { Epic, Task } from '@/utils/types';
+import Button from '@/components/Button';
 
 export type CreateTaskData = { task: Omit<Task, 'id'> & { epicId?: number } };
 
@@ -57,12 +58,7 @@ export default forwardRef<HTMLDialogElement, Props>(function CreateTaskModal(
 					<option value="inprogress">In progress</option>
 					<option value="done">Done</option>
 				</select>
-				<button
-					className="rounded-sm bg-[#651E3E] py-2 text-white outline-offset-2 hover:bg-[#511832]"
-					type="submit"
-				>
-					Create Task
-				</button>
+				<Button type="submit">Create Task</Button>
 			</form>
 			<button onClick={() => innerRef.current?.close()}>X</button>
 		</dialog>
