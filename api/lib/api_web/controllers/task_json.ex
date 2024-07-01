@@ -19,7 +19,8 @@ defmodule ApiWeb.TaskJSON do
     %{
       id: task.id,
       title: task.title,
-      status: task.status
+      status: task.status,
+      epicId: task.epic_id
     }
   end
 end

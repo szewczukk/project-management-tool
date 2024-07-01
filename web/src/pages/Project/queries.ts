@@ -67,22 +67,34 @@ export function useEditTaskMutation(projectId: number) {
 
 	return useMutation({
 		mutationFn: async (data: EditTaskData) => {
-			const response = await api.patch(`/tasks/${data.task.id}`, data);
+			const response = await api.patch(`/tasks/${data.task.id}`, {
+				task: { ...data.task, epic_id: data.task.epicId },
+			});
 			return response.data.data;
 		},
 		onSuccess(data, variables) {
 			queryClient.setQueryData(['projects', projectId], (old) => {
 				// If the task is in epic
 				if (variables.task.epicId !== -1) {
-					const epicIndex = old.epics.findIndex(
-						(epic) => epic.id.toString() === variables.task.epicId?.toString(),
+					const oldEpicIndex = old.epics.findIndex((epic) =>
+						epic.tasks.some(
+							(task) => task.id.toString() === data.id.toString(),
+						),
 					);
 
-					const taskIndex = old.epics[epicIndex].tasks.findIndex(
-						(task) => task.id.toString() === variables.task.taskId?.toString(),
+					const taskIndex = old.epics[oldEpicIndex].tasks.findIndex(
+						(task) => task.id.toString() === variables.task.id.toString(),
 					);
 
-					old.epics[epicIndex].tasks[taskIndex] = data;
+					old.epics[oldEpicIndex].tasks.splice(taskIndex, 1);
+
+					console.log(old.epics, data.epicId);
+
+					const newEpicIndex = old.epics.findIndex(
+						(epic) => epic.id.toString() === data.epicId.toString(),
+					);
+					old.epics[newEpicIndex].tasks.push(data);
+
 					return old;
 				}
 
