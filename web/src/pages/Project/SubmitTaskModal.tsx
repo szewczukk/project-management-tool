@@ -5,7 +5,9 @@ import { Epic, Task } from '@/utils/types';
 import Button from '@/components/Button';
 import { useOpenSubmitTaskModal } from './contexts/OpenSubmitTaskModalContext';
 
-export type SubmitTaskData = { task: Omit<Task, 'id'> & { epicId?: number } };
+export type SubmitTaskData = {
+	task: Omit<Task, 'id'> & { taskId?: number; epicId?: number };
+};
 
 type Props = {
 	onSubmitTask: (data: SubmitTaskData) => void;
@@ -24,7 +26,8 @@ const SubmitTaskModal = forwardRef<HTMLDialogElement, Props>(
 				status: currentlyEdited?.task?.status || 'todo',
 				epicId: currentlyEdited?.epic?.id || -1,
 			},
-			onSubmit: (values) => onSubmitTask({ task: values }),
+			onSubmit: (values) =>
+				onSubmitTask({ task: { ...values, taskId: currentlyEdited?.task.id } }),
 		});
 
 		useEffect(() => {

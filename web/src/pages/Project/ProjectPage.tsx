@@ -1,51 +1,29 @@
-import api from '@/utils/api';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import Kanban from './Kanban';
 import SubmitTaskModal, { SubmitTaskData } from './SubmitTaskModal';
 import { useRef } from 'react';
-import { useProjectById } from './queries';
+import {
+	useEditTaskMutation,
+	useProjectById,
+	useCreateTaskMutation,
+} from './queries';
 import OpenSubmitTaskModalContext from './contexts/OpenSubmitTaskModalContext';
 import OpenSubmitTaskModalButton from './OpenSubmitTaskModalButton';
 
 export default function ProjectPage() {
 	const { id } = useParams();
 	const { data: project, error, status } = useProjectById(parseInt(id!));
-	const queryClient = useQueryClient();
 	const ref = useRef<HTMLDialogElement>(null);
-	const { mutate: createTask } = useMutation({
-		mutationFn: async (data: SubmitTaskData) => {
-			if (data.task.epicId === -1) {
-				const response = await api.post(`/projects/${id}/tasks`, data);
-				return response.data.data;
-			}
+	const { mutate: createTask } = useCreateTaskMutation(parseInt(id!));
+	const { mutate: editTask } = useEditTaskMutation(parseInt(id!));
 
-			const response = await api.post(
-				`/projects/${id}/epics/${data.task.epicId}/tasks`,
-				data,
-			);
+	const handleSubmitTask = (data: SubmitTaskData) => {
+		if (data.task.taskId) {
+			editTask({ task: { ...data.task, id: data.task.taskId } });
+		} else {
+			createTask(data);
+		}
 
-			return response.data.data;
-		},
-		onSuccess(data, variables) {
-			queryClient.setQueryData(['projects', id], (old) => {
-				if (variables.task.epicId === -1) {
-					old.tasks.push(data);
-					return old;
-				}
-
-				const epicIndex = old.epics.findIndex(
-					(epic) => epic.id.toString() === variables.task.epicId?.toString(),
-				);
-
-				old.epics[epicIndex].tasks.push(data);
-				return old;
-			});
-		},
-	});
-
-	const handleCreateTask = (data: SubmitTaskData) => {
-		createTask(data);
 		ref.current!.close();
 	};
 
@@ -78,7 +56,7 @@ export default function ProjectPage() {
 					))}
 				</ul>
 				<SubmitTaskModal
-					onSubmitTask={handleCreateTask}
+					onSubmitTask={handleSubmitTask}
 					epics={project.epics}
 					ref={ref}
 				/>
