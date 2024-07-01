@@ -3,7 +3,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { useFormik } from 'formik';
 import { Epic, Task } from '@/utils/types';
 import Button from '@/components/Button';
-import { useEditTaskModal } from './contexts/EditTaskModalContext';
+import { useOpenSubmitTaskModal } from './contexts/OpenSubmitTaskModalContext';
 
 export type SubmitTaskData = { task: Omit<Task, 'id'> & { epicId?: number } };
 
@@ -15,32 +15,32 @@ type Props = {
 const SubmitTaskModal = forwardRef<HTMLDialogElement, Props>(
 	function SubmitTaskModal(props, ref) {
 		const { epics, onSubmitTask } = props;
-		const { currentlyEditedTask } = useEditTaskModal();
+		const { currentlyEdited } = useOpenSubmitTaskModal();
 
 		const innerRef = useRef<HTMLDialogElement>(null);
 		const formik = useFormik<SubmitTaskData['task']>({
 			initialValues: {
-				title: currentlyEditedTask.task?.title || '',
-				status: currentlyEditedTask.task?.status || 'todo',
-				epicId: currentlyEditedTask.epic?.id || -1,
+				title: currentlyEdited?.task?.title || '',
+				status: currentlyEdited?.task?.status || 'todo',
+				epicId: currentlyEdited?.epic?.id || -1,
 			},
 			onSubmit: (values) => onSubmitTask({ task: values }),
 		});
 
 		useEffect(() => {
 			formik.setValues({
-				title: currentlyEditedTask.task?.title || '',
-				status: currentlyEditedTask.task?.status || 'todo',
-				epicId: currentlyEditedTask.epic?.id || -1,
+				title: currentlyEdited?.task?.title || '',
+				status: currentlyEdited?.task?.status || 'todo',
+				epicId: currentlyEdited?.epic?.id || -1,
 			});
-		}, [currentlyEditedTask]);
+		}, [currentlyEdited]);
 
 		useImperativeHandle(ref, () => innerRef.current!, []);
 
 		return (
 			<dialog ref={innerRef} className="w-[360px] rounded-sm p-8">
 				<h2 className="mb-4 text-lg font-semibold">
-					{currentlyEditedTask.task ? 'Edit Project' : 'Create Project'}
+					{currentlyEdited?.task ? 'Edit Project' : 'Create Project'}
 				</h2>
 				<form className="flex flex-col gap-4" onSubmit={formik.handleSubmit}>
 					<InputGroup

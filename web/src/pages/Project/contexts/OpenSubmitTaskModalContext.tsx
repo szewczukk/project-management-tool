@@ -1,21 +1,44 @@
-import { ReactNode, createContext, useContext } from 'react';
+import { Epic, Task } from '@/utils/types';
+import { ReactNode, createContext, useContext, useState } from 'react';
 
-const openSubmitTaskModalContext = createContext<(() => void) | undefined>(
-	undefined,
-);
+type CurrentlyEdited =
+	| {
+			task: Task;
+			epic: Epic | undefined;
+	  }
+	| undefined;
+
+type OpenSubmitTaskModalContext =
+	| {
+			openSubmitTaskModal: (currentlyEdited?: CurrentlyEdited) => void;
+			currentlyEdited: CurrentlyEdited | undefined;
+	  }
+	| undefined;
+
+const openSubmitTaskModalContext =
+	createContext<OpenSubmitTaskModalContext>(undefined);
 
 type Props = {
 	openSubmitTaskModal: () => void;
 	children: ReactNode;
 };
 
-export default function OpenSubmitTaskModalContext({
-	children,
-	openSubmitTaskModal,
-}: Props) {
+export default function OpenSubmitTaskModalContext(props: Props) {
+	const [currentlyEdited, setCurrentlyEdited] = useState<CurrentlyEdited>();
+
+	const handleOpenSubmitTaskModal = (currentlyEdited: CurrentlyEdited) => {
+		setCurrentlyEdited(currentlyEdited);
+		props.openSubmitTaskModal();
+	};
+
 	return (
-		<openSubmitTaskModalContext.Provider value={openSubmitTaskModal}>
-			{children}
+		<openSubmitTaskModalContext.Provider
+			value={{
+				currentlyEdited,
+				openSubmitTaskModal: handleOpenSubmitTaskModal,
+			}}
+		>
+			{props.children}
 		</openSubmitTaskModalContext.Provider>
 	);
 }

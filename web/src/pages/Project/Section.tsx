@@ -3,7 +3,6 @@ import TaskCard from './TaskCard';
 import { useDroppable } from '@dnd-kit/core';
 import classNames from 'classnames';
 import { useRef } from 'react';
-import { useEditTaskModal } from './contexts/EditTaskModalContext';
 import { useOpenSubmitTaskModal } from './contexts/OpenSubmitTaskModalContext';
 
 type Props = {
@@ -25,8 +24,7 @@ function showStatus(status: TaskStatus) {
 
 export default function Section({ status, tasks, epic }: Props) {
 	const submitTaskModalRef = useRef<HTMLDialogElement>(null);
-	const { setCurrentlyEditedTask } = useEditTaskModal();
-	const openSubmitTaskModal = useOpenSubmitTaskModal();
+	const { openSubmitTaskModal } = useOpenSubmitTaskModal();
 
 	const epicTitle = epic?.title || 'non-aligned';
 	const { setNodeRef, isOver } = useDroppable({
@@ -51,8 +49,7 @@ export default function Section({ status, tasks, epic }: Props) {
 					<li key={task.id}>
 						<TaskCard
 							onDoubleClick={() => {
-								setCurrentlyEditedTask({ task, epic });
-								openSubmitTaskModal();
+								openSubmitTaskModal({ epic, task });
 								submitTaskModalRef.current?.showModal();
 							}}
 							task={task}
