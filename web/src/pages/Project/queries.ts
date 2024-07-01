@@ -3,6 +3,7 @@ import { Task, projectWithEpicsSchema } from '@/utils/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 import { SubmitTaskData } from './SubmitTaskModal';
+import { SubmitEpicData } from './SubmitEpicModal';
 
 const getProjectResponseSchema = z.object({
 	data: projectWithEpicsSchema,
@@ -25,10 +26,6 @@ export function useCreateTaskMutation(projectId: number) {
 
 	return useMutation({
 		mutationFn: async (data: SubmitTaskData) => {
-			if (data.task.taskId) {
-				const response = await api.patch(`/tasks/${data.task.taskId}`, data);
-				return response.data.data;
-			}
 			if (data.task.epicId === -1) {
 				const response = await api.post(`/projects/${projectId}/tasks`, data);
 				return response.data.data;
@@ -95,6 +92,49 @@ export function useEditTaskMutation(projectId: number) {
 				);
 
 				old.tasks[taskIndex] = data;
+				return old;
+			});
+		},
+	});
+}
+
+export function useCreateEpicMutation(projectId: number) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async (data: SubmitEpicData) => {
+			const response = await api.post(
+				`/projects/${data.epic.projectId}/epics`,
+				data,
+			);
+
+			return response.data.data;
+		},
+		onSuccess(data) {
+			queryClient.setQueryData(['projects', projectId], (old) => {
+				old.epics.push(data);
+				return old;
+			});
+		},
+	});
+}
+
+export function useEditEpicMutation(projectId: number) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async (data: SubmitEpicData) => {
+			const response = await api.patch(`/epics/${data.epic.epicId}`, data);
+
+			return response.data.data;
+		},
+		onSuccess(data) {
+			queryClient.setQueryData(['projects', projectId], (old) => {
+				const epicIndex = old.epics.findIndex(
+					(epic) => epic.id.toString() === data.id?.toString(),
+				);
+				old.epics[epicIndex] = data;
+
 				return old;
 			});
 		},

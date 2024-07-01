@@ -12,13 +12,21 @@ import Section from './Section';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { useMutation } from '@tanstack/react-query';
 import api from '@/utils/api';
+import Button from '@/components/Button';
+import { useOpenSubmitEpicModal } from './contexts/OpenSubmitEpicModalContext';
 
 type Props = {
+	projectId: number;
 	epic?: Epic;
 	tasks: Task[];
 };
 
-export default function Kanban({ tasks: initialTasks, epic }: Props) {
+export default function Kanban({
+	tasks: initialTasks,
+	epic,
+	projectId,
+}: Props) {
+	const { openSubmitEpicModal } = useOpenSubmitEpicModal();
 	const { mutate: changeTaskStatus } = useChangeTaskStatus();
 	const [tasks, setTasks] = useState(initialTasks);
 
@@ -57,7 +65,25 @@ export default function Kanban({ tasks: initialTasks, epic }: Props) {
 
 	return (
 		<div className="flex flex-col gap-2 bg-slate-100 p-4">
-			<h2>Epic: {epic ? epic.title : 'Non-aligned'}</h2>
+			<div className="flex items-center justify-between">
+				<h2>Epic: {epic ? epic.title : 'Non-aligned'}</h2>
+				<div>
+					{epic && (
+						<Button
+							variant="secondary"
+							onClick={() => {
+								if (epic) {
+									openSubmitEpicModal({ epic, projectId });
+								} else {
+									openSubmitEpicModal({ projectId });
+								}
+							}}
+						>
+							Edit
+						</Button>
+					)}
+				</div>
+			</div>
 			<div className="flex flex-wrap gap-4">
 				<DndContext onDragEnd={handleDragEnd}>
 					{taskStatuses.map((status) => (

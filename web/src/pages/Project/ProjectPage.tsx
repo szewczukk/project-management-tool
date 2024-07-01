@@ -6,16 +6,23 @@ import {
 	useEditTaskMutation,
 	useProjectById,
 	useCreateTaskMutation,
+	useCreateEpicMutation,
+	useEditEpicMutation,
 } from './queries';
 import OpenSubmitTaskModalContext from './contexts/OpenSubmitTaskModalContext';
-import OpenSubmitTaskModalButton from './OpenSubmitTaskModalButton';
+import ProjectControls from './ProjectControls';
+import OpenSubmitEpicModalContext from './contexts/OpenSubmitEpicModalContext';
+import SubmitEpicModal, { SubmitEpicData } from './SubmitEpicModal';
 
 export default function ProjectPage() {
 	const { id } = useParams();
 	const { data: project, error, status } = useProjectById(parseInt(id!));
-	const ref = useRef<HTMLDialogElement>(null);
+	const submitTaskModalRef = useRef<HTMLDialogElement>(null);
+	const submitEpicModalRef = useRef<HTMLDialogElement>(null);
 	const { mutate: createTask } = useCreateTaskMutation(parseInt(id!));
 	const { mutate: editTask } = useEditTaskMutation(parseInt(id!));
+	const { mutate: createEpic } = useCreateEpicMutation(parseInt(id!));
+	const { mutate: editEpic } = useEditEpicMutation(parseInt(id!));
 
 	const handleSubmitTask = (data: SubmitTaskData) => {
 		if (data.task.taskId) {
@@ -24,11 +31,25 @@ export default function ProjectPage() {
 			createTask(data);
 		}
 
-		ref.current!.close();
+		submitTaskModalRef.current!.close();
+	};
+
+	const handleSubmitEpic = (data: SubmitEpicData) => {
+		if (data.epic.epicId) {
+			editEpic(data);
+		} else {
+			createEpic(data);
+		}
+
+		submitEpicModalRef.current?.close();
 	};
 
 	const openSubmitTaskModal = () => {
-		ref.current?.showModal();
+		submitTaskModalRef.current?.showModal();
+	};
+
+	const openSubmitEpicModal = () => {
+		submitEpicModalRef.current?.showModal();
 	};
 
 	if (status === 'error') {
@@ -41,26 +62,36 @@ export default function ProjectPage() {
 
 	return (
 		<OpenSubmitTaskModalContext openSubmitTaskModal={openSubmitTaskModal}>
-			<div className="flex h-screen w-full flex-col overflow-hidden">
-				<nav className="flex items-center justify-between bg-slate-200 p-4">
-					<h1>Project: {project.title}</h1>
-					<div>
-						<OpenSubmitTaskModalButton />
-					</div>
-				</nav>
-				<ul className="flex flex-col gap-4 overflow-y-auto p-4">
-					<Kanban tasks={project.tasks} />
+			<OpenSubmitEpicModalContext openSubmitEpicModal={openSubmitEpicModal}>
+				<div className="flex h-screen w-full flex-col overflow-hidden">
+					<nav className="flex items-center justify-between bg-slate-200 p-4">
+						<h1>Project: {project.title}</h1>
+						<ProjectControls />
+					</nav>
+					<ul className="flex flex-col gap-4 overflow-y-auto p-4">
+						<Kanban tasks={project.tasks} projectId={parseInt(id!)} />
 
-					{project.epics.map((epic) => (
-						<Kanban tasks={epic.tasks} epic={epic} key={epic.id} />
-					))}
-				</ul>
-				<SubmitTaskModal
-					onSubmitTask={handleSubmitTask}
-					epics={project.epics}
-					ref={ref}
-				/>
-			</div>
+						{project.epics.map((epic) => (
+							<Kanban
+								tasks={epic.tasks}
+								epic={epic}
+								key={epic.id}
+								projectId={parseInt(id!)}
+							/>
+						))}
+					</ul>
+					<SubmitTaskModal
+						onSubmitTask={handleSubmitTask}
+						epics={project.epics}
+						ref={submitTaskModalRef}
+					/>
+					<SubmitEpicModal
+						onSubmitEpic={handleSubmitEpic}
+						projectId={parseInt(id!)}
+						ref={submitEpicModalRef}
+					/>
+				</div>
+			</OpenSubmitEpicModalContext>
 		</OpenSubmitTaskModalContext>
 	);
 }
