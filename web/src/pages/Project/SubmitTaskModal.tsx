@@ -3,58 +3,44 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { useFormik } from 'formik';
 import { Epic, Task } from '@/utils/types';
 import Button from '@/components/Button';
+import { useEditTaskModal } from './contexts/EditTaskModalContext';
 
 export type SubmitTaskData = { task: Omit<Task, 'id'> & { epicId?: number } };
 
 type Props = {
 	onSubmitTask: (data: SubmitTaskData) => void;
 	epics: Epic[];
-} & (
-	| {
-			// if we don't do it like this,
-			// then we wouldn't have conditional types or the editedTask would be a required attribute.
-			editedTask?: undefined;
-	  }
-	| {
-			editedTask: Task;
-			editedTaskEpic: Epic | undefined;
-	  }
-);
+};
 
 const SubmitTaskModal = forwardRef<HTMLDialogElement, Props>(
 	function SubmitTaskModal(props, ref) {
 		const { epics, onSubmitTask } = props;
+		const { currentlyEditedTask } = useEditTaskModal();
 
 		const innerRef = useRef<HTMLDialogElement>(null);
 		const formik = useFormik<SubmitTaskData['task']>({
 			initialValues: {
-				title: props.editedTask?.title || '',
-				status: props.editedTask?.status || 'todo',
-				epicId: props.editedTask ? props.editedTaskEpic?.id || -1 : -1,
+				title: currentlyEditedTask.task?.title || '',
+				status: currentlyEditedTask.task?.status || 'todo',
+				epicId: currentlyEditedTask.epic?.id || -1,
 			},
 			onSubmit: (values) => onSubmitTask({ task: values }),
 		});
 
 		useEffect(() => {
-			const { editedTask } = props;
-
-			if (!editedTask) {
-				return;
-			}
-
 			formik.setValues({
-				title: editedTask.title,
-				status: editedTask.status,
-				epicId: props.editedTaskEpic?.id || -1,
+				title: currentlyEditedTask.task?.title || '',
+				status: currentlyEditedTask.task?.status || 'todo',
+				epicId: currentlyEditedTask.epic?.id || -1,
 			});
-		}, [props.editedTask]);
+		}, [currentlyEditedTask]);
 
 		useImperativeHandle(ref, () => innerRef.current!, []);
 
 		return (
 			<dialog ref={innerRef} className="w-[360px] rounded-sm p-8">
 				<h2 className="mb-4 text-lg font-semibold">
-					{props.editedTask ? 'Edit Project' : 'Create Project'}
+					{currentlyEditedTask.task ? 'Edit Project' : 'Create Project'}
 				</h2>
 				<form className="flex flex-col gap-4" onSubmit={formik.handleSubmit}>
 					<InputGroup

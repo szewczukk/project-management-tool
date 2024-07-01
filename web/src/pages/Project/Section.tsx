@@ -2,11 +2,9 @@ import { Epic, Task, TaskStatus } from '@/utils/types';
 import TaskCard from './TaskCard';
 import { useDroppable } from '@dnd-kit/core';
 import classNames from 'classnames';
-import { useRef, useState } from 'react';
-import SubmitTaskModal from './SubmitTaskModal';
-import { useParams } from 'react-router-dom';
-import { useProjectById } from './queries';
-import { createPortal } from 'react-dom';
+import { useRef } from 'react';
+import { useEditTaskModal } from './contexts/EditTaskModalContext';
+import { useOpenSubmitTaskModal } from './contexts/OpenSubmitTaskModalContext';
 
 type Props = {
 	status: TaskStatus;
@@ -27,11 +25,8 @@ function showStatus(status: TaskStatus) {
 
 export default function Section({ status, tasks, epic }: Props) {
 	const submitTaskModalRef = useRef<HTMLDialogElement>(null);
-	const [currentlyEditedTask, setCurrentlyEditedTask] = useState<
-		Task | undefined
-	>();
-	const { id } = useParams();
-	const { data: project } = useProjectById(parseInt(id!));
+	const { setCurrentlyEditedTask } = useEditTaskModal();
+	const openSubmitTaskModal = useOpenSubmitTaskModal();
 
 	const epicTitle = epic?.title || 'non-aligned';
 	const { setNodeRef, isOver } = useDroppable({
@@ -56,7 +51,8 @@ export default function Section({ status, tasks, epic }: Props) {
 					<li key={task.id}>
 						<TaskCard
 							onDoubleClick={() => {
-								setCurrentlyEditedTask(task);
+								setCurrentlyEditedTask({ task, epic });
+								openSubmitTaskModal();
 								submitTaskModalRef.current?.showModal();
 							}}
 							task={task}
@@ -64,16 +60,6 @@ export default function Section({ status, tasks, epic }: Props) {
 					</li>
 				))}
 			</ul>
-			{createPortal(
-				<SubmitTaskModal
-					onSubmitTask={(data) => console.log(data)}
-					epics={project!.epics}
-					ref={submitTaskModalRef}
-					editedTask={currentlyEditedTask}
-					editedTaskEpic={epic}
-				/>,
-				document.body,
-			)}
 		</div>
 	);
 }
