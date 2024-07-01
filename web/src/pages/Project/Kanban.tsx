@@ -1,4 +1,5 @@
 import {
+	Epic,
 	Task,
 	TaskStatus,
 	taskSchema,
@@ -7,17 +8,17 @@ import {
 } from '@/utils/types';
 import { useState } from 'react';
 import { z } from 'zod';
-import Section from './Secion';
+import Section from './Section';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { useMutation } from '@tanstack/react-query';
 import api from '@/utils/api';
 
 type Props = {
-	epicTitle?: string;
+	epic?: Epic;
 	tasks: Task[];
 };
 
-export default function Kanban({ tasks: initialTasks, epicTitle }: Props) {
+export default function Kanban({ tasks: initialTasks, epic }: Props) {
 	const { mutate: changeTaskStatus } = useChangeTaskStatus();
 	const [tasks, setTasks] = useState(initialTasks);
 
@@ -34,6 +35,10 @@ export default function Kanban({ tasks: initialTasks, epicTitle }: Props) {
 		const { status } = z
 			.object({ status: taskStatusSchema })
 			.parse(over.data.current);
+
+		if (tasks.find((task) => task.id === taskId)?.status === status) {
+			return;
+		}
 
 		setTasks((prev) =>
 			prev.map((task) => {
@@ -52,7 +57,7 @@ export default function Kanban({ tasks: initialTasks, epicTitle }: Props) {
 
 	return (
 		<div className="flex flex-col gap-2 bg-slate-100 p-4">
-			<h2>Epic: {epicTitle || 'Non-aligned'}</h2>
+			<h2>Epic: {epic ? epic.title : 'Non-aligned'}</h2>
 			<div className="flex flex-wrap gap-4">
 				<DndContext onDragEnd={handleDragEnd}>
 					{taskStatuses.map((status) => (
@@ -60,7 +65,7 @@ export default function Kanban({ tasks: initialTasks, epicTitle }: Props) {
 							status={status}
 							tasks={tasks.filter((task) => task.status === status)}
 							key={status}
-							epicTitle={epicTitle || 'Non-aligned'}
+							epic={epic}
 						/>
 					))}
 				</DndContext>

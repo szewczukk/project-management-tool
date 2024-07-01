@@ -1,36 +1,19 @@
 import api from '@/utils/api';
-import { projectWithEpicsSchema } from '@/utils/types';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
-import { z } from 'zod';
 import Kanban from './Kanban';
-import CreateTaskModal, { CreateTaskData } from './CreateTaskModal';
+import SubmitTaskModal, { SubmitTaskData } from './SubmitTaskModal';
 import { useRef } from 'react';
 import Button from '@/components/Button';
-
-const getProjectResponseSchema = z.object({
-	data: projectWithEpicsSchema,
-});
+import { useProjectById } from './queries';
 
 export default function ProjectPage() {
 	const { id } = useParams();
+	const { data: project, error, status } = useProjectById(parseInt(id!));
 	const queryClient = useQueryClient();
 	const ref = useRef<HTMLDialogElement>(null);
-	const {
-		data: project,
-		error,
-		status,
-	} = useQuery({
-		queryKey: ['projects', id],
-		queryFn: async () => {
-			const response = await api.get(`/projects/${id}`);
-
-			const project = getProjectResponseSchema.parse(response.data).data;
-			return project;
-		},
-	});
 	const { mutate: createTask } = useMutation({
-		mutationFn: async (data: CreateTaskData) => {
+		mutationFn: async (data: SubmitTaskData) => {
 			if (data.task.epicId === -1) {
 				const response = await api.post(`/projects/${id}/tasks`, data);
 				return response.data.data;
@@ -60,7 +43,7 @@ export default function ProjectPage() {
 		},
 	});
 
-	const handleCreateTask = (data: CreateTaskData) => {
+	const handleCreateTask = (data: SubmitTaskData) => {
 		createTask(data);
 		ref.current!.close();
 	};
@@ -87,11 +70,11 @@ export default function ProjectPage() {
 				<Kanban tasks={project.tasks} />
 
 				{project.epics.map((epic) => (
-					<Kanban tasks={epic.tasks} epicTitle={epic.title} key={epic.id} />
+					<Kanban tasks={epic.tasks} epic={epic} key={epic.id} />
 				))}
 			</ul>
-			<CreateTaskModal
-				onCreateTask={handleCreateTask}
+			<SubmitTaskModal
+				onSubmitTask={handleCreateTask}
 				epics={project.epics}
 				ref={ref}
 			/>

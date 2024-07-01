@@ -1,11 +1,13 @@
 import { Task } from '@/utils/types';
 import { useDraggable } from '@dnd-kit/core';
+import { MouseEventHandler } from 'react';
 
 type Props = {
 	task: Task;
+	onDoubleClick: MouseEventHandler<HTMLDivElement>;
 };
 
-export default function TaskCard({ task }: Props) {
+export default function TaskCard({ task, onDoubleClick }: Props) {
 	const { attributes, listeners, setNodeRef, transform } = useDraggable({
 		id: `taskCard:${task.id}`,
 		data: { taskId: task.id },
@@ -22,6 +24,7 @@ export default function TaskCard({ task }: Props) {
 			className="min-h-32 w-32 rounded-sm border border-slate-300 bg-slate-100 p-4"
 			ref={setNodeRef}
 			style={style}
+			onDoubleClick={onDoubleClick}
 			{...listeners}
 			{...attributes}
 		>
