@@ -14,6 +14,7 @@ import { useMutation } from '@tanstack/react-query';
 import api from '@/utils/api';
 import Button from '@/components/Button';
 import { useOpenSubmitEpicModal } from './contexts/OpenSubmitEpicModalContext';
+import { useDeleteEpicMutation } from './queries';
 
 type Props = {
 	projectId: number;
@@ -29,6 +30,7 @@ export default function Kanban({
 	const { openSubmitEpicModal } = useOpenSubmitEpicModal();
 	const { mutate: changeTaskStatus } = useChangeTaskStatus();
 	const [tasks, setTasks] = useState(initialTasks);
+	const { mutate: deleteEpic } = useDeleteEpicMutation(projectId);
 
 	const handleDragEnd = (event: DragEndEvent) => {
 		const { over, active } = event;
@@ -69,18 +71,28 @@ export default function Kanban({
 				<h2>Epic: {epic ? epic.title : 'Non-aligned'}</h2>
 				<div>
 					{epic && (
-						<Button
-							variant="secondary"
-							onClick={() => {
-								if (epic) {
-									openSubmitEpicModal({ epic, projectId });
-								} else {
-									openSubmitEpicModal({ projectId });
-								}
-							}}
-						>
-							Edit
-						</Button>
+						<div className="flex gap-4">
+							<Button
+								variant="secondary"
+								onClick={() => {
+									if (epic) {
+										openSubmitEpicModal({ epic, projectId });
+									} else {
+										openSubmitEpicModal({ projectId });
+									}
+								}}
+							>
+								Edit
+							</Button>
+							<Button
+								variant="secondary"
+								onClick={() => {
+									deleteEpic(epic.id);
+								}}
+							>
+								Delete
+							</Button>
+						</div>
 					)}
 				</div>
 			</div>

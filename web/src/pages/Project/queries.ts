@@ -208,3 +208,21 @@ export function useDeleteTaskMutation(projectId: number) {
 		},
 	});
 }
+
+export function useDeleteEpicMutation(projectId: number) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async (epicId: number) => {
+			return await api.delete(`/epics/${epicId}`);
+		},
+		onSuccess(_data, epicId) {
+			queryClient.setQueryData(['projects', projectId], (old) => {
+				return {
+					...old,
+					epics: old.epics.filter((epic) => epic.id !== epicId),
+				};
+			});
+		},
+	});
+}
