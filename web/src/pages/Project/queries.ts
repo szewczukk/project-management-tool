@@ -68,42 +68,65 @@ export function useEditTaskMutation(projectId: number) {
 	return useMutation({
 		mutationFn: async (data: EditTaskData) => {
 			const response = await api.patch(`/tasks/${data.task.id}`, {
-				task: { ...data.task, epic_id: data.task.epicId },
+				task: {
+					...data.task,
+					epic_id:
+						data.task.epicId?.toString() === (-1).toString()
+							? null
+							: data.task.epicId,
+				},
 			});
 			return response.data.data;
 		},
 		onSuccess(data, variables) {
 			queryClient.setQueryData(['projects', projectId], (old) => {
-				// If the task is in epic
-				if (variables.task.epicId !== -1) {
-					const oldEpicIndex = old.epics.findIndex((epic) =>
+				// If the epic didn't change
+				if (variables.task.epicId === data.epicId) {
+					// If the epic is unaligned
+					if (variables.task.epicId === -1) {
+						const taskIndex = old.tasks.findIndex(
+							(task) =>
+								task.id.toString() === variables.task.taskId?.toString(),
+						);
+
+						old.tasks[taskIndex] = data;
+						return old;
+					}
+
+					// If the epic is non-aligned
+					const epicIndex = old.epics.findIndex((epic) =>
 						epic.tasks.some(
 							(task) => task.id.toString() === data.id.toString(),
 						),
 					);
 
-					const taskIndex = old.epics[oldEpicIndex].tasks.findIndex(
+					const taskIndex = old.epics[epicIndex].tasks.findIndex(
 						(task) => task.id.toString() === variables.task.id.toString(),
 					);
 
-					old.epics[oldEpicIndex].tasks.splice(taskIndex, 1);
+					old.epics[taskIndex] = data;
 
-					console.log(old.epics, data.epicId);
+					return old;
+				}
+
+				// If the epic did change and it went from non-aligned to aligned
+				if (variables.task.epicId !== -1 && data.epicId !== null) {
+					const taskIndex = old.tasks.findIndex(
+						(task) => task.id.toString() === data.id.toString(),
+					);
+					old.tasks.splice(taskIndex, 1);
 
 					const newEpicIndex = old.epics.findIndex(
 						(epic) => epic.id.toString() === data.epicId.toString(),
 					);
 					old.epics[newEpicIndex].tasks.push(data);
-
 					return old;
 				}
 
-				// If task is non-aligned
-				const taskIndex = old.tasks.findIndex(
-					(task) => task.id.toString() === variables.task.taskId?.toString(),
-				);
+				// If the epic did change and it went from aligned to non-aligned
+				if (data.epicId === null) {
+				}
 
-				old.tasks[taskIndex] = data;
 				return old;
 			});
 		},
