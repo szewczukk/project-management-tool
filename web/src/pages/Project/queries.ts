@@ -175,3 +175,36 @@ export function useEditEpicMutation(projectId: number) {
 		},
 	});
 }
+
+export function useDeleteTaskMutation(projectId: number) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({ taskId }: { taskId: number; epicId: number }) => {
+			return await api.delete(`/tasks/${taskId}`);
+		},
+		onSuccess(_data, variables) {
+			queryClient.setQueryData(['projects', projectId], (old) => {
+				if (variables.epicId === -1) {
+					const deletedIndex = old.tasks.findIndex(
+						(task) => task.id === variables.taskId,
+					);
+
+					delete old.tasks[deletedIndex];
+
+					return old;
+				}
+				const epicIndex = old.epics.findIndex(
+					(epic) => epic.id === variables.epicId,
+				);
+				const taskIndex = old.epics[epicIndex].tasks.findIndex(
+					(task) => task.id === variables.taskId,
+				);
+
+				delete old.epics[epicIndex].tasks[taskIndex];
+
+				return old;
+			});
+		},
+	});
+}

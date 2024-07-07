@@ -8,6 +8,7 @@ import {
 	useCreateTaskMutation,
 	useCreateEpicMutation,
 	useEditEpicMutation,
+	useDeleteTaskMutation,
 } from './queries';
 import OpenSubmitTaskModalContext from './contexts/OpenSubmitTaskModalContext';
 import ProjectControls from './ProjectControls';
@@ -23,6 +24,7 @@ export default function ProjectPage() {
 	const { mutate: editTask } = useEditTaskMutation(parseInt(id!));
 	const { mutate: createEpic } = useCreateEpicMutation(parseInt(id!));
 	const { mutate: editEpic } = useEditEpicMutation(parseInt(id!));
+	const { mutate: deleteTask } = useDeleteTaskMutation(parseInt(id!));
 
 	const handleSubmitTask = (data: SubmitTaskData) => {
 		if (data.task.taskId) {
@@ -84,6 +86,10 @@ export default function ProjectPage() {
 						onSubmitTask={handleSubmitTask}
 						epics={project.epics}
 						ref={submitTaskModalRef}
+						onDeleteTask={({ epicId, taskId }) => {
+							deleteTask({ epicId, taskId });
+							submitTaskModalRef.current?.close();
+						}}
 					/>
 					<SubmitEpicModal
 						onSubmitEpic={handleSubmitEpic}

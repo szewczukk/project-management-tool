@@ -11,6 +11,7 @@ export type SubmitTaskData = {
 
 type Props = {
 	onSubmitTask: (data: SubmitTaskData) => void;
+	onDeleteTask: (data: { epicId: number; taskId: number }) => void;
 	epics: Epic[];
 };
 
@@ -69,6 +70,18 @@ const SubmitTaskModal = forwardRef<HTMLDialogElement, Props>(
 					<Button type="submit">Create Task</Button>
 				</form>
 				<button onClick={() => innerRef.current?.close()}>X</button>
+				{currentlyEdited && (
+					<button
+						onClick={() =>
+							props.onDeleteTask({
+								epicId: currentlyEdited.epic?.id || -1,
+								taskId: currentlyEdited.task.id,
+							})
+						}
+					>
+						Delete
+					</button>
+				)}
 			</dialog>
 		);
 	},
