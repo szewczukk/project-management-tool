@@ -20,9 +20,16 @@ export const taskSchema = z.object({
 
 export type Task = z.infer<typeof taskSchema>;
 
+export const epicPriorities = ['low', 'medium', 'high'] as const;
+export const epicPrioritySchema = z.enum(epicPriorities);
+export type EpicPriority = z.infer<typeof epicPrioritySchema>;
+
 export const epicSchema = z.object({
 	id: z.number(),
 	title: z.string(),
+	description: z.string(),
+	priority: epicPrioritySchema,
+	status: taskStatusSchema,
 	tasks: z.array(taskSchema),
 });
 

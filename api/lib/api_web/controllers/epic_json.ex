@@ -19,6 +19,9 @@ defmodule ApiWeb.EpicJSON do
     %{
       id: epic.id,
       title: epic.title,
+      description: epic.description,
+      priority: epic.priority,
+      status: epic.status,
       tasks: load_tasks(epic.tasks)
     }
   end

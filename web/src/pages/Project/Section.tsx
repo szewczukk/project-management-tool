@@ -4,23 +4,13 @@ import { useDroppable } from '@dnd-kit/core';
 import classNames from 'classnames';
 import { useRef } from 'react';
 import { useOpenSubmitTaskModal } from './contexts/OpenSubmitTaskModalContext';
+import { showStatus } from '@/utils/helpers';
 
 type Props = {
 	status: TaskStatus;
 	tasks: Task[];
 	epic?: Epic;
 };
-
-function showStatus(status: TaskStatus) {
-	switch (status) {
-		case 'inprogress':
-			return 'In progress 🧑‍💻';
-		case 'todo':
-			return 'To do 🤔';
-		case 'done':
-			return 'Done 🎉';
-	}
-}
 
 export default function Section({ status, tasks, epic }: Props) {
 	const submitTaskModalRef = useRef<HTMLDialogElement>(null);

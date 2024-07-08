@@ -15,6 +15,7 @@ import api from '@/utils/api';
 import Button from '@/components/Button';
 import { useOpenSubmitEpicModal } from './contexts/OpenSubmitEpicModalContext';
 import { useDeleteEpicMutation } from './queries';
+import { showPriority, showStatus } from '@/utils/helpers';
 
 type Props = {
 	projectId: number;
@@ -68,7 +69,15 @@ export default function Kanban({
 	return (
 		<div className="flex flex-col gap-2 bg-slate-100 p-4">
 			<div className="flex items-center justify-between">
-				<h2>Epic: {epic ? epic.title : 'Non-aligned'}</h2>
+				<div className="flex flex-col gap-2">
+					<h2>Epic: {epic ? epic.title : 'Non-aligned'}</h2>
+					{epic && (
+						<div className="flex gap-4">
+							<p>{showStatus(epic.status)}</p>
+							<p>{showPriority(epic.priority)}</p>
+						</div>
+					)}
+				</div>
 				<div>
 					{epic && (
 						<div className="flex gap-4">

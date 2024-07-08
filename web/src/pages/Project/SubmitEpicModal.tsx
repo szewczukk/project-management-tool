@@ -4,6 +4,7 @@ import { useFormik } from 'formik';
 import { Epic } from '@/utils/types';
 import Button from '@/components/Button';
 import { useOpenSubmitEpicModal } from './contexts/OpenSubmitEpicModalContext';
+import SelectGroup from '@/components/SelectGrup';
 
 type FormValues = Omit<Epic, 'id' | 'tasks'>;
 
@@ -25,6 +26,9 @@ const SubmitEpicModal = forwardRef<HTMLDialogElement, Props>(
 		const formik = useFormik<FormValues>({
 			initialValues: {
 				title: currentlyEdited?.epic?.title || '',
+				description: currentlyEdited?.epic?.description || '',
+				priority: currentlyEdited?.epic?.priority || 'medium',
+				status: currentlyEdited?.epic?.status || 'todo',
 			},
 			onSubmit: (values) =>
 				onSubmitEpic({
@@ -35,6 +39,9 @@ const SubmitEpicModal = forwardRef<HTMLDialogElement, Props>(
 		useEffect(() => {
 			formik.setValues({
 				title: currentlyEdited?.epic?.title || '',
+				description: currentlyEdited?.epic?.description || '',
+				priority: currentlyEdited?.epic?.priority || 'medium',
+				status: currentlyEdited?.epic?.status || 'todo',
 			});
 		}, [currentlyEdited]);
 
@@ -48,8 +55,33 @@ const SubmitEpicModal = forwardRef<HTMLDialogElement, Props>(
 							label="Title"
 							type="text"
 							id="title"
-							placeholder="Enter project title.."
+							placeholder="Enter epic title.."
 							{...formik.getFieldProps('title')}
+						/>
+						<InputGroup
+							label="Description"
+							id="description"
+							placeholder="Enter epic description.."
+							isTextArea
+							{...formik.getFieldProps('description')}
+						/>
+						<SelectGroup
+							label="Choose status"
+							options={[
+								{ key: 'todo', title: 'To do' },
+								{ key: 'inprogress', title: 'In progress' },
+								{ key: 'done', title: 'Done' },
+							]}
+							{...formik.getFieldProps('status')}
+						/>
+						<SelectGroup
+							label="Choose priority"
+							options={[
+								{ key: 'high', title: 'High' },
+								{ key: 'medium', title: 'Medium' },
+								{ key: 'low', title: 'Low' },
+							]}
+							{...formik.getFieldProps('priority')}
 						/>
 						<Button type="submit">Create Epic</Button>
 					</form>
