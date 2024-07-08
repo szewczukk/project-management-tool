@@ -4,6 +4,7 @@ import { useFormik } from 'formik';
 import { Epic, Task } from '@/utils/types';
 import Button from '@/components/Button';
 import { useOpenSubmitTaskModal } from './contexts/OpenSubmitTaskModalContext';
+import SelectGroup from '@/components/SelectGrup';
 
 export type SubmitTaskData = {
 	task: Omit<Task, 'id'> & { taskId?: number; epicId?: number };
@@ -43,45 +44,57 @@ const SubmitTaskModal = forwardRef<HTMLDialogElement, Props>(
 
 		return (
 			<dialog ref={innerRef} className="w-[360px] rounded-sm p-8">
-				<h2 className="mb-4 text-lg font-semibold">
-					{currentlyEdited?.task ? 'Edit Project' : 'Create Project'}
-				</h2>
-				<form className="flex flex-col gap-4" onSubmit={formik.handleSubmit}>
-					<InputGroup
-						label="Title"
-						type="text"
-						id="title"
-						placeholder="Enter project title.."
-						{...formik.getFieldProps('title')}
-					/>
-					<select id="epicId" {...formik.getFieldProps('epicId')}>
-						<option value={-1}>---</option>
-						{epics.map((epic) => (
-							<option value={epic.id} key={epic.id}>
-								{epic.title}
-							</option>
-						))}
-					</select>
-					<select id="status" {...formik.getFieldProps('status')}>
-						<option value="todo">To do</option>
-						<option value="inprogress">In progress</option>
-						<option value="done">Done</option>
-					</select>
-					<Button type="submit">Create Task</Button>
-				</form>
-				<button onClick={() => innerRef.current?.close()}>X</button>
-				{currentlyEdited && (
-					<button
-						onClick={() =>
-							props.onDeleteTask({
-								epicId: currentlyEdited.epic?.id || -1,
-								taskId: currentlyEdited.task.id,
-							})
-						}
-					>
-						Delete
-					</button>
-				)}
+				<div className="flex flex-col gap-4">
+					<form className="flex flex-col gap-4" onSubmit={formik.handleSubmit}>
+						<InputGroup
+							label="Title"
+							type="text"
+							id="title"
+							placeholder="Enter project title.."
+							{...formik.getFieldProps('title')}
+						/>
+						<SelectGroup
+							label="Choose epic"
+							options={[{ key: -1, title: '---' }].concat(
+								epics.map((epic) => ({ key: epic.id, title: epic.title })),
+							)}
+							{...formik.getFieldProps('epicId')}
+						/>
+						<SelectGroup
+							label="Choose status"
+							options={[
+								{ key: 'todo', title: 'To do' },
+								{ key: 'inprogress', title: 'In progress' },
+								{ key: 'done', title: 'Done' },
+							]}
+							{...formik.getFieldProps('status')}
+						/>
+						<Button type="submit">Create Task</Button>
+					</form>
+					<div className="flex gap-2">
+						<Button
+							variant="secondary"
+							className="flex-1"
+							onClick={() => innerRef.current?.close()}
+						>
+							Close
+						</Button>
+						{currentlyEdited && (
+							<Button
+								variant="secondary"
+								className="flex-1"
+								onClick={() =>
+									props.onDeleteTask({
+										epicId: currentlyEdited.epic?.id || -1,
+										taskId: currentlyEdited.task.id,
+									})
+								}
+							>
+								Delete
+							</Button>
+						)}
+					</div>
+				</div>
 			</dialog>
 		);
 	},

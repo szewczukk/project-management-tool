@@ -42,20 +42,27 @@ const SubmitEpicModal = forwardRef<HTMLDialogElement, Props>(
 
 		return (
 			<dialog ref={innerRef} className="w-[360px] rounded-sm p-8">
-				<h2 className="mb-4 text-lg font-semibold">
-					{currentlyEdited?.epic?.title ? 'Edit Epic' : 'Create Epic'}
-				</h2>
-				<form className="flex flex-col gap-4" onSubmit={formik.handleSubmit}>
-					<InputGroup
-						label="Title"
-						type="text"
-						id="title"
-						placeholder="Enter project title.."
-						{...formik.getFieldProps('title')}
-					/>
-					<Button type="submit">Create Epic</Button>
-				</form>
-				<button onClick={() => innerRef.current?.close()}>X</button>
+				<div className="flex flex-col gap-4">
+					<form className="flex flex-col gap-4" onSubmit={formik.handleSubmit}>
+						<InputGroup
+							label="Title"
+							type="text"
+							id="title"
+							placeholder="Enter project title.."
+							{...formik.getFieldProps('title')}
+						/>
+						<Button type="submit">Create Epic</Button>
+					</form>
+					<div className="flex gap-2">
+						<Button
+							variant="secondary"
+							className="flex-1"
+							onClick={() => innerRef.current?.close()}
+						>
+							Close
+						</Button>
+					</div>
+				</div>
 			</dialog>
 		);
 	},
