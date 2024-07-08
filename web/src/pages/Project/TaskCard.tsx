@@ -1,3 +1,4 @@
+import { showPriority } from '@/utils/helpers';
 import { Task } from '@/utils/types';
 import { useDraggable } from '@dnd-kit/core';
 import { MouseEventHandler } from 'react';
@@ -21,14 +22,17 @@ export default function TaskCard({ task, onDoubleClick }: Props) {
 
 	return (
 		<div
-			className="min-h-32 w-32 rounded-sm border border-slate-300 bg-slate-100 p-4"
+			className="flex min-h-24 w-72 flex-col justify-between rounded-sm border border-slate-300 bg-slate-100 p-4"
 			ref={setNodeRef}
 			style={style}
 			onDoubleClick={onDoubleClick}
 			{...listeners}
 			{...attributes}
 		>
-			<p>{task.title}</p>
+			<p className="text-sm">{task.title}</p>
+			<p className="text-sm italic text-gray-500">
+				{showPriority(task.priority)}
+			</p>
 		</div>
 	);
 }

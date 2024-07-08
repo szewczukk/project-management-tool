@@ -12,17 +12,21 @@ export const taskStatuses = ['todo', 'inprogress', 'done'] as const;
 export const taskStatusSchema = z.enum(taskStatuses);
 export type TaskStatus = z.infer<typeof taskStatusSchema>;
 
-export const taskSchema = z.object({
-	id: z.number(),
-	title: z.string(),
-	status: taskStatusSchema,
-});
-
-export type Task = z.infer<typeof taskSchema>;
-
 export const epicPriorities = ['low', 'medium', 'high'] as const;
 export const epicPrioritySchema = z.enum(epicPriorities);
 export type EpicPriority = z.infer<typeof epicPrioritySchema>;
+
+export const taskSchema = z.object({
+	id: z.number(),
+	title: z.string(),
+	description: z.string(),
+	started_at: z.date().nullable(),
+	completed_at: z.date().nullable(),
+	status: taskStatusSchema,
+	priority: epicPrioritySchema,
+});
+
+export type Task = z.infer<typeof taskSchema>;
 
 export const epicSchema = z.object({
 	id: z.number(),

@@ -83,7 +83,9 @@ const SubmitEpicModal = forwardRef<HTMLDialogElement, Props>(
 							]}
 							{...formik.getFieldProps('priority')}
 						/>
-						<Button type="submit">Create Epic</Button>
+						<Button type="submit">
+							{currentlyEdited ? 'Edit Epic' : 'Create Epic'}
+						</Button>
 					</form>
 					<div className="flex gap-2">
 						<Button

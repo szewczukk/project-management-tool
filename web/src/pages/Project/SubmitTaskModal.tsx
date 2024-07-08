@@ -7,7 +7,10 @@ import { useOpenSubmitTaskModal } from './contexts/OpenSubmitTaskModalContext';
 import SelectGroup from '@/components/SelectGrup';
 
 export type SubmitTaskData = {
-	task: Omit<Task, 'id'> & { taskId?: number; epicId?: number };
+	task: Omit<Task, 'id' | 'started_at' | 'completed_at'> & {
+		taskId?: number;
+		epicId?: number;
+	};
 };
 
 type Props = {
@@ -25,7 +28,9 @@ const SubmitTaskModal = forwardRef<HTMLDialogElement, Props>(
 		const formik = useFormik<SubmitTaskData['task']>({
 			initialValues: {
 				title: currentlyEdited?.task?.title || '',
+				description: currentlyEdited?.task.description || '',
 				status: currentlyEdited?.task?.status || 'todo',
+				priority: currentlyEdited?.task.priority || 'medium',
 				epicId: currentlyEdited?.epic?.id || -1,
 			},
 			onSubmit: (values) =>
@@ -35,7 +40,9 @@ const SubmitTaskModal = forwardRef<HTMLDialogElement, Props>(
 		useEffect(() => {
 			formik.setValues({
 				title: currentlyEdited?.task?.title || '',
+				description: currentlyEdited?.task.description || '',
 				status: currentlyEdited?.task?.status || 'todo',
+				priority: currentlyEdited?.task.priority || 'medium',
 				epicId: currentlyEdited?.epic?.id || -1,
 			});
 		}, [currentlyEdited]);
@@ -53,6 +60,13 @@ const SubmitTaskModal = forwardRef<HTMLDialogElement, Props>(
 							placeholder="Enter project title.."
 							{...formik.getFieldProps('title')}
 						/>
+						<InputGroup
+							label="Description"
+							id="description"
+							placeholder="Enter epic description.."
+							isTextArea
+							{...formik.getFieldProps('description')}
+						/>
 						<SelectGroup
 							label="Choose epic"
 							options={[{ key: -1, title: '---' }].concat(
@@ -69,7 +83,18 @@ const SubmitTaskModal = forwardRef<HTMLDialogElement, Props>(
 							]}
 							{...formik.getFieldProps('status')}
 						/>
-						<Button type="submit">Create Task</Button>
+						<SelectGroup
+							label="Choose priority"
+							options={[
+								{ key: 'high', title: 'High' },
+								{ key: 'medium', title: 'Medium' },
+								{ key: 'low', title: 'Low' },
+							]}
+							{...formik.getFieldProps('priority')}
+						/>
+						<Button type="submit">
+							{currentlyEdited ? 'Edit Task' : 'Create Task'}
+						</Button>
 					</form>
 					<div className="flex gap-2">
 						<Button

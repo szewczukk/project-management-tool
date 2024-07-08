@@ -6,7 +6,6 @@ defmodule Api.Projects do
   import Ecto.Query, warn: false
   alias Api.Repo
 
-  alias Api.Tasks.Task
   alias Api.Projects.Project
 
   @doc """

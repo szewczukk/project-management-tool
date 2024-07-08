@@ -4,7 +4,12 @@ defmodule Api.Tasks.Task do
 
   schema "tasks" do
     field :title, :string
+    field :description, :string
     field :status, Ecto.Enum, values: [:todo, :inprogress, :done]
+    field :priority, Ecto.Enum, values: [:low, :medium, :high]
+    field :started_at, :date
+    field :completed_at, :date
+
     belongs_to :project, Api.Projects.Project
     belongs_to :epic, Api.Epics.Epic
 
@@ -14,7 +19,16 @@ defmodule Api.Tasks.Task do
   @doc false
   def changeset(task, attrs) do
     task
-    |> cast(attrs, [:title, :status, :project_id, :epic_id])
-    |> validate_required([:title, :status, :project_id])
+    |> cast(attrs, [
+      :title,
+      :description,
+      :status,
+      :priority,
+      :started_at,
+      :completed_at,
+      :project_id,
+      :epic_id
+    ])
+    |> validate_required([:title, :description, :status, :priority, :project_id])
   end
 end
