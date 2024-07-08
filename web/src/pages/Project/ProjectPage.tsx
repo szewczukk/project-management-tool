@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import Kanban from './Kanban';
 import SubmitTaskModal, { SubmitTaskData } from './SubmitTaskModal';
 import { useRef } from 'react';
@@ -67,7 +67,12 @@ export default function ProjectPage() {
 			<OpenSubmitEpicModalContext openSubmitEpicModal={openSubmitEpicModal}>
 				<div className="flex h-screen w-full flex-col overflow-hidden">
 					<nav className="flex items-center justify-between bg-slate-200 p-4">
-						<h1>Project: {project.title}</h1>
+						<div className="flex items-center gap-4">
+							<Link className="text-sm text-gray-500" to="/">
+								Go back..
+							</Link>
+							<h1>Project: {project.title}</h1>
+						</div>
 						<ProjectControls />
 					</nav>
 					<ul className="flex flex-col gap-4 overflow-y-auto p-4">

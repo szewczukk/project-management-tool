@@ -72,7 +72,7 @@ export default function Kanban({
 				<div className="flex flex-col gap-2">
 					<h2>Epic: {epic ? epic.title : 'Non-aligned'}</h2>
 					{epic && (
-						<div className="flex gap-4">
+						<div className="flex gap-4 text-sm italic text-gray-500">
 							<p>{showStatus(epic.status)}</p>
 							<p>{showPriority(epic.priority)}</p>
 						</div>
