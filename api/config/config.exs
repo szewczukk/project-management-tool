@@ -7,9 +7,17 @@
 # General application configuration
 import Config
 
+if config_env() in [:dev, :test] do
+  import_config("envs.exs")
+end
+
 config :api,
   ecto_repos: [Api.Repo],
   generators: [timestamp_type: :utc_datetime]
+
+config :api, ApiWeb.Auth.Guardian,
+  issuer: "api",
+  secret_key: System.get_env("GUARDIAN_SECRET_KEY")
 
 # Configures the endpoint
 config :api, ApiWeb.Endpoint,

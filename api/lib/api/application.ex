@@ -10,9 +10,7 @@ defmodule Api.Application do
     children = [
       ApiWeb.Telemetry,
       Api.Repo,
-      {Ecto.Migrator,
-        repos: Application.fetch_env!(:api, :ecto_repos),
-        skip: skip_migrations?()},
+      {Ecto.Migrator, repos: Application.fetch_env!(:api, :ecto_repos), skip: skip_migrations?()},
       {DNSCluster, query: Application.get_env(:api, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Api.PubSub},
       # Start the Finch HTTP client for sending emails

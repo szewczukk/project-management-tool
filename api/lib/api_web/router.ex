@@ -5,6 +5,10 @@ defmodule ApiWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :auth do
+    plug ApiWeb.Auth.GuardianPipeline
+  end
+
   scope "/api", ApiWeb do
     pipe_through :api
 
@@ -18,6 +22,14 @@ defmodule ApiWeb.Router do
 
     resources "/tasks", TaskController, only: [:update, :delete, :show]
     resources "/epics", EpicController, only: [:update, :delete, :show]
+    resources "/accounts", AccountController
+    post "/signin", AccountController, :sign_in
+  end
+
+  scope "/api", ApiWeb do
+    pipe_through [:api, :auth]
+
+    get "/me", AccountController, :me
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
