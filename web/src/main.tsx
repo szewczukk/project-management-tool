@@ -6,6 +6,7 @@ import './index.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ProjectPage from './pages/Project/ProjectPage';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import LoginPage from './pages/Login/LoginPage';
 
 const router = createBrowserRouter([
 	{
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
 	{
 		path: '/projects/:id',
 		Component: ProjectPage,
+	},
+	{
+		path: '/login',
+		Component: LoginPage,
 	},
 ]);
 

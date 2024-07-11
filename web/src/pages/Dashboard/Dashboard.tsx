@@ -7,12 +7,16 @@ import {
 	useProjectsQuery,
 } from './queries';
 import CreateProjectModal from './CreateProjectModal';
+import { useCurrentUser } from '@/utils/hooks';
 
 export default function Dashboard() {
 	const { data, error, status } = useProjectsQuery();
 	const createProjectMutation = useCreateProjectMutation();
+	const { data: currentUser } = useCurrentUser();
 	const dialogRef = useRef<HTMLDialogElement>(null);
 	const [filter, setFilter] = useState('');
+
+	console.log(currentUser);
 
 	const onCreateProjectClick = () => {
 		dialogRef.current?.showModal();
