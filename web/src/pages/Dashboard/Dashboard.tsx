@@ -16,8 +16,6 @@ export default function Dashboard() {
 	const dialogRef = useRef<HTMLDialogElement>(null);
 	const [filter, setFilter] = useState('');
 
-	console.log(currentUser);
-
 	const onCreateProjectClick = () => {
 		dialogRef.current?.showModal();
 	};

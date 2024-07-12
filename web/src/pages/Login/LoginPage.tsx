@@ -3,6 +3,7 @@ import InputGroup from '@/components/InputGroup';
 import api from '@/utils/api';
 import { useMutation } from '@tanstack/react-query';
 import { useFormik } from 'formik';
+import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
 type Credentials = {
@@ -11,6 +12,7 @@ type Credentials = {
 };
 
 export default function LoginPage() {
+	const navigate = useNavigate();
 	const { mutate } = useMutation({
 		mutationFn: async (credentials: Credentials) => {
 			const response = await api.post('/signin', { credentials });
@@ -21,6 +23,8 @@ export default function LoginPage() {
 		onSuccess(data) {
 			const { token } = z.object({ token: z.string() }).parse(data);
 			localStorage.setItem('token', token);
+
+			navigate('/');
 		},
 	});
 	const formik = useFormik<Credentials>({
