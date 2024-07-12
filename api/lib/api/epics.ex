@@ -19,14 +19,14 @@ defmodule Api.Epics do
   """
   def list_epics do
     Epic
-    |> preload(:tasks)
+    |> preload(tasks: [:assignee], owner: [])
     |> Repo.all()
   end
 
   def list_epics_by_project(project_id) do
     Epic
     |> where([e], e.project_id == ^project_id)
-    |> preload(:tasks)
+    |> preload(tasks: [:assignee], owner: [])
     |> Repo.all()
   end
 
@@ -47,7 +47,7 @@ defmodule Api.Epics do
   def get_epic!(id) do
     Epic
     |> Repo.get!(id)
-    |> Repo.preload(:tasks)
+    |> Repo.preload(tasks: [:assignee], owner: [])
   end
 
   @doc """

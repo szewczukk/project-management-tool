@@ -1,20 +1,11 @@
-import {
-	Epic,
-	Task,
-	TaskStatus,
-	taskSchema,
-	taskStatusSchema,
-	taskStatuses,
-} from '@/utils/types';
+import { Epic, Task, taskStatusSchema, taskStatuses } from '@/utils/types';
 import { useState } from 'react';
 import { z } from 'zod';
 import Section from './Section';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
-import { useMutation } from '@tanstack/react-query';
-import api from '@/utils/api';
 import Button from '@/components/Button';
 import { useOpenSubmitEpicModal } from './contexts/OpenSubmitEpicModalContext';
-import { useDeleteEpicMutation } from './queries';
+import { useDeleteEpicMutation, useEditTaskMutation } from './queries';
 import { showPriority, showStatus } from '@/utils/helpers';
 
 type Props = {
@@ -29,7 +20,7 @@ export default function Kanban({
 	projectId,
 }: Props) {
 	const { openSubmitEpicModal } = useOpenSubmitEpicModal();
-	const { mutate: changeTaskStatus } = useChangeTaskStatus();
+	const { mutate: changeTaskStatus } = useEditTaskMutation(projectId);
 	const [tasks, setTasks] = useState(initialTasks);
 	const { mutate: deleteEpic } = useDeleteEpicMutation(projectId);
 
@@ -47,7 +38,9 @@ export default function Kanban({
 			.object({ status: taskStatusSchema })
 			.parse(over.data.current);
 
-		if (tasks.find((task) => task.id === taskId)?.status === status) {
+		const task = tasks.find((task) => task.id === taskId);
+
+		if (!task || task.status === status) {
 			return;
 		}
 
@@ -61,8 +54,10 @@ export default function Kanban({
 			}),
 		);
 		changeTaskStatus({
-			id: taskId,
-			newStatus: status,
+			task: {
+				...task,
+				status,
+			},
 		});
 	};
 
@@ -75,6 +70,7 @@ export default function Kanban({
 						<div className="flex gap-4 text-sm italic text-gray-500">
 							<p>{showStatus(epic.status)}</p>
 							<p>{showPriority(epic.priority)}</p>
+							<p>Owner: {epic.owner.username}</p>
 						</div>
 					)}
 				</div>
@@ -119,23 +115,4 @@ export default function Kanban({
 			</div>
 		</div>
 	);
-}
-
-const mutateChangeTaskStatusResponseSchema = z.object({
-	data: taskSchema,
-});
-
-export function useChangeTaskStatus() {
-	return useMutation({
-		mutationFn: async (data: { id: number; newStatus: TaskStatus }) => {
-			const response = await api.patch(`/tasks/${data.id}`, {
-				task: { status: data.newStatus },
-			});
-
-			const task = mutateChangeTaskStatusResponseSchema.parse(
-				response.data,
-			).data;
-			return task;
-		},
-	});
 }

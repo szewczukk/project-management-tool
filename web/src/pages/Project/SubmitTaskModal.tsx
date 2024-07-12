@@ -5,11 +5,13 @@ import { Epic, Task } from '@/utils/types';
 import Button from '@/components/Button';
 import { useOpenSubmitTaskModal } from './contexts/OpenSubmitTaskModalContext';
 import SelectGroup from '@/components/SelectGrup';
+import { useGetAllAccounts } from './queries';
 
 export type SubmitTaskData = {
-	task: Omit<Task, 'id' | 'started_at' | 'completed_at'> & {
+	task: Omit<Task, 'id' | 'started_at' | 'completed_at' | 'assignee'> & {
 		taskId?: number;
 		epicId?: number;
+		assigneeId?: number;
 	};
 };
 
@@ -23,6 +25,7 @@ const SubmitTaskModal = forwardRef<HTMLDialogElement, Props>(
 	function SubmitTaskModal(props, ref) {
 		const { epics, onSubmitTask } = props;
 		const { currentlyEdited } = useOpenSubmitTaskModal();
+		const { data: accounts } = useGetAllAccounts();
 
 		const innerRef = useRef<HTMLDialogElement>(null);
 		const formik = useFormik<SubmitTaskData['task']>({
@@ -32,6 +35,7 @@ const SubmitTaskModal = forwardRef<HTMLDialogElement, Props>(
 				status: currentlyEdited?.task?.status || 'todo',
 				priority: currentlyEdited?.task.priority || 'medium',
 				epicId: currentlyEdited?.epic?.id || -1,
+				assigneeId: currentlyEdited?.task.assignee?.id || -1,
 			},
 			onSubmit: (values) =>
 				onSubmitTask({ task: { ...values, taskId: currentlyEdited?.task.id } }),
@@ -44,14 +48,27 @@ const SubmitTaskModal = forwardRef<HTMLDialogElement, Props>(
 				status: currentlyEdited?.task?.status || 'todo',
 				priority: currentlyEdited?.task.priority || 'medium',
 				epicId: currentlyEdited?.epic?.id || -1,
+				assigneeId: currentlyEdited?.task.assignee?.id || -1,
 			});
 		}, [currentlyEdited]);
 
 		useImperativeHandle(ref, () => innerRef.current!, []);
 
 		return (
-			<dialog ref={innerRef} className="w-[360px] rounded-sm p-8">
+			<dialog ref={innerRef} className="w-[512px] rounded-sm p-8">
 				<div className="flex flex-col gap-4">
+					{currentlyEdited?.task.started_at && (
+						<p>
+							Started at:{' '}
+							{new Date(currentlyEdited.task.started_at).toUTCString()}
+						</p>
+					)}
+					{currentlyEdited?.task.completed_at && (
+						<p>
+							Completed at:{' '}
+							{new Date(currentlyEdited.task.completed_at).toUTCString()}
+						</p>
+					)}
 					<form className="flex flex-col gap-4" onSubmit={formik.handleSubmit}>
 						<InputGroup
 							label="Title"
@@ -91,6 +108,16 @@ const SubmitTaskModal = forwardRef<HTMLDialogElement, Props>(
 								{ key: 'low', title: 'Low' },
 							]}
 							{...formik.getFieldProps('priority')}
+						/>
+						<SelectGroup
+							label="Choose an assignee"
+							options={[{ key: -1, title: '---' }].concat(
+								accounts?.map((account) => ({
+									key: account.id,
+									title: account.username,
+								})) || [],
+							)}
+							{...formik.getFieldProps('assigneeId')}
 						/>
 						<Button type="submit">
 							{currentlyEdited ? 'Edit Task' : 'Create Task'}

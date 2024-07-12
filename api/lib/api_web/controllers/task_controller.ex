@@ -44,6 +44,40 @@ defmodule ApiWeb.TaskController do
   def update(conn, %{"id" => id, "task" => task_params}) do
     task = Tasks.get_task!(id)
 
+    current_datetime = DateTime.utc_now()
+    formatted_datetime = DateTime.to_iso8601(current_datetime)
+
+    task_params =
+      task_params
+      |> Map.delete("started_at")
+      |> Map.delete("completed_at")
+
+    task_params =
+      cond do
+        Map.get(task_params, "assignee_id") != nil && task.status === :todo ->
+          task_params
+          |> Map.put("status", :inprogress)
+          |> Map.put("started_at", formatted_datetime)
+
+        Map.get(task_params, "assignee_id", -1) === nil && task.status === :inprogress ->
+          task_params
+          |> Map.put("status", "todo")
+          |> Map.put("started_at", nil)
+
+        Map.get(task_params, "status") === "done" && task.status !== :done ->
+          task_params
+          |> Map.put("completed_at", formatted_datetime)
+
+        Map.get(task_params, "status") === "todo" ->
+          task_params
+          |> Map.put("completed_at", nil)
+          |> Map.put("started_at", nil)
+          |> Map.put("assignee_id", nil)
+
+        true ->
+          task_params
+      end
+
     with {:ok, %Task{} = task} <- Tasks.update_task(task, task_params) do
       render(conn, :show, task: task)
     end

@@ -38,7 +38,7 @@ defmodule Api.Projects do
   def get_project!(id) do
     Project
     |> Repo.get!(id)
-    |> Repo.preload(epics: [:tasks], tasks: [])
+    |> Repo.preload(epics: [tasks: [:assignee], owner: []], tasks: [:assignee])
   end
 
   @doc """

@@ -19,7 +19,7 @@ defmodule ApiWeb.AccountJSON do
     %{data: %{token: token}}
   end
 
-  defp data(%Account{} = account) do
+  def data(%Account{} = account) do
     %{
       id: account.id,
       username: account.username

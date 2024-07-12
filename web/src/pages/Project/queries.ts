@@ -1,13 +1,14 @@
 import api from '@/utils/api';
-import { Task, projectWithEpicsSchema } from '@/utils/types';
+import {
+	Task,
+	accountSchema,
+	projectWithEpicsSchema,
+	taskSchema,
+} from '@/utils/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 import { SubmitTaskData } from './SubmitTaskModal';
 import { SubmitEpicData } from './SubmitEpicModal';
-
-const getProjectResponseSchema = z.object({
-	data: projectWithEpicsSchema,
-});
 
 export function useProjectById(id: number) {
 	return useQuery({
@@ -15,7 +16,7 @@ export function useProjectById(id: number) {
 		queryFn: async () => {
 			const response = await api.get(`/projects/${id}`);
 
-			const project = getProjectResponseSchema.parse(response.data).data;
+			const project = projectWithEpicsSchema.parse(response.data.data);
 			return project;
 		},
 	});
@@ -26,14 +27,22 @@ export function useCreateTaskMutation(projectId: number) {
 
 	return useMutation({
 		mutationFn: async (data: SubmitTaskData) => {
+			const body = { ...data.task };
+
+			if (data.task.assigneeId !== -1) {
+				body.assignee_id = data.task.assigneeId;
+			}
+
 			if (data.task.epicId === -1) {
-				const response = await api.post(`/projects/${projectId}/tasks`, data);
+				const response = await api.post(`/projects/${projectId}/tasks`, {
+					task: body,
+				});
 				return response.data.data;
 			}
 
 			const response = await api.post(
 				`/projects/${projectId}/epics/${data.task.epicId}/tasks`,
-				data,
+				{ task: body },
 			);
 
 			return response.data.data;
@@ -59,7 +68,7 @@ export function useCreateTaskMutation(projectId: number) {
 }
 
 export type EditTaskData = {
-	task: Task & { epicId?: number };
+	task: Task & { epicId?: number; assigneeId?: number };
 };
 
 export function useEditTaskMutation(projectId: number) {
@@ -67,65 +76,38 @@ export function useEditTaskMutation(projectId: number) {
 
 	return useMutation({
 		mutationFn: async (data: EditTaskData) => {
+			const body = { ...data.task };
+
+			if (data.task.assigneeId?.toString() !== '-1') {
+				body.assignee_id = data.task.assigneeId;
+			} else {
+				body.assignee_id = null;
+			}
+
+			if (data.task.epicId?.toString() !== '-1') {
+				body.epic_id = data.task.epicId;
+			}
+
 			const response = await api.patch(`/tasks/${data.task.id}`, {
-				task: {
-					...data.task,
-					epic_id:
-						data.task.epicId?.toString() === (-1).toString()
-							? null
-							: data.task.epicId,
-				},
+				task: body,
 			});
-			return response.data.data;
+			return taskSchema.parse(response.data.data);
 		},
-		onSuccess(data, variables) {
+		onSuccess(data) {
 			queryClient.setQueryData(['projects', projectId], (old) => {
-				// If the epic didn't change
-				if (variables.task.epicId === data.epicId) {
-					// If the epic is unaligned
-					if (variables.task.epicId === -1) {
-						const taskIndex = old.tasks.findIndex(
-							(task) =>
-								task.id.toString() === variables.task.taskId?.toString(),
-						);
-
-						old.tasks[taskIndex] = data;
-						return old;
-					}
-
-					// If the epic is non-aligned
-					const epicIndex = old.epics.findIndex((epic) =>
-						epic.tasks.some(
-							(task) => task.id.toString() === data.id.toString(),
-						),
-					);
-
-					const taskIndex = old.epics[epicIndex].tasks.findIndex(
-						(task) => task.id.toString() === variables.task.id.toString(),
-					);
-
-					old.epics[taskIndex] = data;
+				console.log(data);
+				if (!data.epicId) {
+					const taskId = old.tasks.findIndex((task) => task.id === data.id);
+					old.tasks[taskId] = data;
 
 					return old;
 				}
 
-				// If the epic did change and it went from non-aligned to aligned
-				if (variables.task.epicId !== -1 && data.epicId !== null) {
-					const taskIndex = old.tasks.findIndex(
-						(task) => task.id.toString() === data.id.toString(),
-					);
-					old.tasks.splice(taskIndex, 1);
-
-					const newEpicIndex = old.epics.findIndex(
-						(epic) => epic.id.toString() === data.epicId.toString(),
-					);
-					old.epics[newEpicIndex].tasks.push(data);
-					return old;
-				}
-
-				// If the epic did change and it went from aligned to non-aligned
-				if (data.epicId === null) {
-				}
+				const epicId = old.epics.findIndex((epic) => epic.id === data.epicId);
+				const taskId = old.epics[epicId].tasks.findIndex(
+					(task) => task.id === data.id,
+				);
+				old.epics[epicId].tasks[taskId] = data;
 
 				return old;
 			});
@@ -223,6 +205,18 @@ export function useDeleteEpicMutation(projectId: number) {
 					epics: old.epics.filter((epic) => epic.id !== epicId),
 				};
 			});
+		},
+	});
+}
+
+export function useGetAllAccounts() {
+	return useQuery({
+		queryKey: ['accounts'],
+		queryFn: async () => {
+			const response = await api.get('/accounts');
+			const result = z.array(accountSchema).parse(response.data.data);
+
+			return result;
 		},
 	});
 }

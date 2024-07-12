@@ -22,7 +22,8 @@ defmodule ApiWeb.EpicJSON do
       description: epic.description,
       priority: epic.priority,
       status: epic.status,
-      tasks: load_tasks(epic.tasks)
+      tasks: load_tasks(epic.tasks),
+      owner: ApiWeb.AccountJSON.data(epic.owner)
     }
   end
 

@@ -22,9 +22,22 @@ defmodule ApiWeb.TaskJSON do
       description: task.description,
       status: task.status,
       priority: task.priority,
-      started_at: task.started_at,
-      completed_at: task.completed_at,
-      epicId: task.epic_id
+      started_at: format_date(task.started_at),
+      completed_at: format_date(task.completed_at),
+      epicId: task.epic_id,
+      assignee: load_assignee(task.assignee)
     }
   end
+
+  defp format_date(nil), do: nil
+
+  defp format_date(date) do
+    IO.inspect(date)
+
+    date
+  end
+
+  defp load_assignee(nil), do: nil
+  defp load_assignee(%Ecto.Association.NotLoaded{}), do: nil
+  defp load_assignee(assignee), do: ApiWeb.AccountJSON.data(assignee)
 end

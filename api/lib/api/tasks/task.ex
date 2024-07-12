@@ -12,6 +12,7 @@ defmodule Api.Tasks.Task do
 
     belongs_to :project, Api.Projects.Project
     belongs_to :epic, Api.Epics.Epic
+    belongs_to :assignee, Api.Accounts.Account
 
     timestamps(type: :utc_datetime)
   end
@@ -27,8 +28,10 @@ defmodule Api.Tasks.Task do
       :started_at,
       :completed_at,
       :project_id,
+      :assignee_id,
       :epic_id
     ])
     |> validate_required([:title, :description, :status, :priority, :project_id])
+    |> foreign_key_constraint(:assignee_id)
   end
 end

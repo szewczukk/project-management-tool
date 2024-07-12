@@ -14,6 +14,7 @@ import OpenSubmitTaskModalContext from './contexts/OpenSubmitTaskModalContext';
 import ProjectControls from './ProjectControls';
 import OpenSubmitEpicModalContext from './contexts/OpenSubmitEpicModalContext';
 import SubmitEpicModal, { SubmitEpicData } from './SubmitEpicModal';
+import { useCurrentUser } from '@/utils/hooks';
 
 export default function ProjectPage() {
 	const { id } = useParams();
@@ -25,6 +26,7 @@ export default function ProjectPage() {
 	const { mutate: createEpic } = useCreateEpicMutation(parseInt(id!));
 	const { mutate: editEpic } = useEditEpicMutation(parseInt(id!));
 	const { mutate: deleteTask } = useDeleteTaskMutation(parseInt(id!));
+	const { data: currentUser } = useCurrentUser();
 
 	const handleSubmitTask = (data: SubmitTaskData) => {
 		if (data.task.taskId) {
@@ -74,6 +76,7 @@ export default function ProjectPage() {
 							<h1>Project: {project.title}</h1>
 						</div>
 						<ProjectControls />
+						<p>Welcome, {currentUser?.username}!</p>
 					</nav>
 					<ul className="flex flex-col gap-4 overflow-y-auto p-4">
 						<Kanban tasks={project.tasks} projectId={parseInt(id!)} />

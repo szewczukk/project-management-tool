@@ -9,6 +9,7 @@ defmodule Api.Epics.Epic do
     field :status, Ecto.Enum, values: [:todo, :inprogress, :done]
 
     belongs_to :project, Api.Projects.Project
+    belongs_to :owner, Api.Accounts.Account
     has_many :tasks, Api.Tasks.Task
 
     timestamps(type: :utc_datetime)
@@ -17,7 +18,7 @@ defmodule Api.Epics.Epic do
   @doc false
   def changeset(epic, attrs) do
     epic
-    |> cast(attrs, [:title, :project_id, :description, :priority, :status])
-    |> validate_required([:title, :project_id, :priority, :status])
+    |> cast(attrs, [:title, :project_id, :owner_id, :description, :priority, :status])
+    |> validate_required([:title, :project_id, :owner_id, :priority, :status])
   end
 end

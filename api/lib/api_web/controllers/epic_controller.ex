@@ -6,19 +6,26 @@ defmodule ApiWeb.EpicController do
 
   action_fallback ApiWeb.FallbackController
 
+  plug ApiWeb.Auth.GuardianPipeline when action in [:create]
+
   def index(conn, %{"project_id" => project_id}) do
     epics = Epics.list_epics_by_project(project_id)
     render(conn, :index, epics: epics)
   end
 
   def create(conn, %{"epic" => epic_params, "project_id" => project_id}) do
-    epic_params = Map.put(epic_params, "project_id", project_id)
+    if Guardian.Plug.authenticated?(conn) do
+      account = Guardian.Plug.current_resource(conn)
 
-    with {:ok, %Epic{} = epic} <- Epics.create_epic(epic_params) do
-      conn
-      |> put_status(:created)
-      |> put_resp_header("location", ~p"/api/epics/#{epic}")
-      |> render(:show, epic: epic)
+      epic_params = Map.put(epic_params, "project_id", project_id)
+      epic_params = Map.put(epic_params, "owner_id", account.id)
+
+      with {:ok, %Epic{} = epic} <- Epics.create_epic(epic_params) do
+        conn
+        |> put_status(:created)
+        |> put_resp_header("location", ~p"/api/epics/#{epic}")
+        |> render(:show, epic: epic)
+      end
     end
   end
 

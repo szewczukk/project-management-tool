@@ -65,6 +65,10 @@ defmodule Api.Tasks do
     %Task{}
     |> Task.changeset(attrs)
     |> Repo.insert()
+    |> case do
+      {:ok, created_task} -> {:ok, Repo.preload(created_task, :assignee)}
+      error -> error
+    end
   end
 
   @doc """
@@ -83,6 +87,10 @@ defmodule Api.Tasks do
     task
     |> Task.changeset(attrs)
     |> Repo.update()
+    |> case do
+      {:ok, updated_task} -> {:ok, Repo.preload(updated_task, :assignee)}
+      error -> error
+    end
   end
 
   @doc """
