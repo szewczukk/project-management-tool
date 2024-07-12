@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Kanban from './Kanban';
 import SubmitTaskModal, { SubmitTaskData } from './SubmitTaskModal';
 import { useRef } from 'react';
@@ -15,9 +15,13 @@ import ProjectControls from './ProjectControls';
 import OpenSubmitEpicModalContext from './contexts/OpenSubmitEpicModalContext';
 import SubmitEpicModal, { SubmitEpicData } from './SubmitEpicModal';
 import { useCurrentUser } from '@/utils/hooks';
+import Button from '@/components/Button';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function ProjectPage() {
 	const { id } = useParams();
+	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 	const { data: project, error, status } = useProjectById(parseInt(id!));
 	const submitTaskModalRef = useRef<HTMLDialogElement>(null);
 	const submitEpicModalRef = useRef<HTMLDialogElement>(null);
@@ -76,7 +80,19 @@ export default function ProjectPage() {
 							<h1>Project: {project.title}</h1>
 						</div>
 						<ProjectControls />
-						<p>Welcome, {currentUser?.username}!</p>
+						<div className="flex items-center gap-4">
+							<p>Welcome, {currentUser?.username}!</p>
+							<Button
+								variant="secondary"
+								onClick={() => {
+									queryClient.removeQueries({ queryKey: ['me'] });
+									localStorage.removeItem('token');
+									navigate('/login');
+								}}
+							>
+								Log out
+							</Button>
+						</div>
 					</nav>
 					<ul className="flex flex-col gap-4 overflow-y-auto p-4">
 						<Kanban tasks={project.tasks} projectId={parseInt(id!)} />
