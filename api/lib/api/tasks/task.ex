@@ -7,8 +7,8 @@ defmodule Api.Tasks.Task do
     field :description, :string
     field :status, Ecto.Enum, values: [:todo, :inprogress, :done]
     field :priority, Ecto.Enum, values: [:low, :medium, :high]
-    field :started_at, :date
-    field :completed_at, :date
+    field :started_at, :utc_datetime
+    field :completed_at, :utc_datetime
 
     belongs_to :project, Api.Projects.Project
     belongs_to :epic, Api.Epics.Epic

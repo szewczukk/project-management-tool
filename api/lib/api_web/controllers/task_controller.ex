@@ -44,8 +44,7 @@ defmodule ApiWeb.TaskController do
   def update(conn, %{"id" => id, "task" => task_params}) do
     task = Tasks.get_task!(id)
 
-    current_datetime = DateTime.utc_now()
-    formatted_datetime = DateTime.to_iso8601(current_datetime)
+    current_utc_time = DateTime.utc_now()
 
     task_params =
       task_params
@@ -57,7 +56,7 @@ defmodule ApiWeb.TaskController do
         Map.get(task_params, "assignee_id") != nil && task.status === :todo ->
           task_params
           |> Map.put("status", :inprogress)
-          |> Map.put("started_at", formatted_datetime)
+          |> Map.put("started_at", current_utc_time)
 
         Map.get(task_params, "assignee_id", -1) === nil && task.status === :inprogress ->
           task_params
@@ -66,7 +65,7 @@ defmodule ApiWeb.TaskController do
 
         Map.get(task_params, "status") === "done" && task.status !== :done ->
           task_params
-          |> Map.put("completed_at", formatted_datetime)
+          |> Map.put("completed_at", current_utc_time)
 
         Map.get(task_params, "status") === "todo" ->
           task_params
